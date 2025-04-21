@@ -1,9 +1,9 @@
 [project]
-name = "remnawave_api"
-version = "1.0.0"
+name = "remnawave-api"
+version = "1.0.1"
 description = "A Python SDK for interacting with the Remnawave API."
 authors = [
-    {name = "sm1ky",email = "sm1ky@forestsnet.com"}
+    {name = "Artem",email = "sm1ky@forestsnet.com"}
 ]
 license = { text = "MIT" }
 readme = "README.md"
@@ -12,6 +12,24 @@ dependencies = [
     "rapid-api-client (==0.6.0)",
     "orjson (>=3.10.15,<4.0.0)",
 ]
+keywords = ["remnawave", "api", "sdk", "proxy", "httpx", "async", "xray"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Framework :: AsyncIO",
+]
+
+[project.urls]
+Homepage = "https://github.com/sm1ky/remnawave-api"
+Documentation-EN = "https://github.com/sm1ky/remnawave-api/blob/production/README.md"
+Developer = "https://t.me/forests_dev"
 
 [tool.poetry.group.test.dependencies]
 ruff = "^0.4.4"

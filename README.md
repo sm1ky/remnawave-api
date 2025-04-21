@@ -1,5 +1,13 @@
 # Remnawave SDK
 
+[![Stars](https://img.shields.io/github/stars/sm1ky/remnawave-api.svg?style=social)](https://github.com/sm1ky/remnawave-api/stargazers)
+[![Forks](https://img.shields.io/github/forks/sm1ky/remnawave-api.svg?style=social)](https://github.com/sm1ky/remnawave-api/network/members)
+[![Issues](https://img.shields.io/github/issues/sm1ky/remnawave-api.svg)](https://github.com/sm1ky/remnawave-api/issues)
+[![Supported python versions](https://img.shields.io/pypi/pyversions/remnawave-api.svg)](https://pypi.python.org/pypi/remnawave-api)
+[![Downloads](https://img.shields.io/pypi/dm/remnawave-api.svg)](https://pypi.python.org/pypi/remnawave-api)
+[![PyPi Package Version](https://img.shields.io/pypi/v/remnawave-api)](https://pypi.python.org/pypi/remnawave-api)
+[![Publish Python Package](https://github.com/sm1ky/remnawave-api/actions/workflows/upload.yml/badge.svg?branch=production)](https://github.com/sm1ky/remnawave-api/actions/workflows/upload.yml)
+
 A Python SDK client for interacting with the [Remnawave API](https://remna.st).
 This library simplifies working with the API by providing convenient controllers, Pydantic models for requests and responses, and fast serialization with `orjson`.
 
@@ -15,8 +23,11 @@ This library simplifies working with the API by providing convenient controllers
 Currently, the SDK is available via Git. You can install it directly using `pip`:
 
 ```bash
-pip install git+https://github.com/sm1ky/remnawave_api.git
+pip install git+https://github.com/sm1ky/remnawave-api.git
 ```
+
+## 🔎 View on pypi
+[Open](https://pypi.python.org/pypi/remnawave-api)
 
 ---
 
@@ -32,8 +43,8 @@ Here’s a quick example to get you started:
 import os
 import asyncio
 
-from remnawave import RemnawaveSDK
-from remnawave.models import UsersResponseDto, UserResponseDto
+from remnawave-api import RemnawaveSDK
+from remnawave-api.models import UsersResponseDto, UserResponseDto
 
 async def main():
     # URL to your panel (ex. https://vpn.com or http://127.0.0.1:3000)
