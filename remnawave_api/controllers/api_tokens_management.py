@@ -4,30 +4,35 @@ from httpx import Response
 from rapid_api_client import Path
 from rapid_api_client.annotations import PydanticBody
 
-from remnawave_api.models import CreateApiTokenRequestDto
+from remnawave_api.models import (
+    CreateApiTokenRequestDto,
+    CreateApiTokenResponseDto,
+    DeleteApiTokenResponseDto,
+    FindAllApiTokensResponseDto,
+)
 from remnawave_api.rapid import BaseController, delete, get, post
 
 
 class APITokensManagementController(BaseController):
-    @post("/tokens/create", response_class=Response)
+    @post("/tokens/create", response_class=CreateApiTokenResponseDto)
     async def create(
         self,
         body: Annotated[CreateApiTokenRequestDto, PydanticBody()],
-    ) -> Response:
+    ) -> CreateApiTokenResponseDto:
         """Create new API token"""
         ...
 
-    @delete("/tokens/delete/{uuid}", response_class=Response)
+    @delete("/tokens/delete/{uuid}", response_class=DeleteApiTokenResponseDto)
     async def delete(
         self,
         uuid: Annotated[str, Path(description="UUID of the API token")],
-    ) -> Response:
+    ) -> DeleteApiTokenResponseDto:
         """Delete API token"""
         ...
 
-    @get("/tokens", response_class=Response)
+    @get("/tokens", response_class=FindAllApiTokensResponseDto)
     async def find_all(
         self,
-    ) -> Response:
+    ) -> FindAllApiTokensResponseDto:
         """Get all API tokens"""
         ...
