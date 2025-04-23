@@ -43,8 +43,8 @@ Here’s a quick example to get you started:
 import os
 import asyncio
 
-from remnawave-api import RemnawaveSDK
-from remnawave-api.models import UsersResponseDto, UserResponseDto
+from remnawave_api import RemnawaveSDK
+from remnawave_api.models import UsersResponseDto, UserResponseDto
 
 async def main():
     # URL to your panel (ex. https://vpn.com or http://127.0.0.1:3000)
