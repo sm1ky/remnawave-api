@@ -30,10 +30,21 @@ class RemnawaveSDK:
         client: Optional[httpx.AsyncClient] = None,
         base_url: Optional[str] = None,
         token: Optional[str] = None,
+        caddy_token: Optional[str] = None,
     ):
+        """
+        Remnawave SDK init
+
+        Args:
+            client (Optional[httpx.AsyncClient]): - Default client. 
+            base_url (Optional[str]): - Base url of the Remnawave panel. Defaults to None.
+            token (Optional[str]): - Token for authorization. 
+            caddy_token (Optional[str]): - Token for Caddy Auth (Headers). Defaults to None.
+        """
         self._client = client
         self._token = token
         self.base_url = base_url
+        self.caddy_token = caddy_token
 
         self._validate_params()
 
@@ -76,13 +87,21 @@ class RemnawaveSDK:
         )
 
     def _prepare_headers(self) -> dict:
-        if not self._token.startswith("Bearer "):
-            self._token = "Bearer " + self._token
-        return {"Authorization": self._token}
+        headers = {}
+        if self._token:
+            headers["Authorization"] = (
+                self._token if self._token.startswith("Bearer ") else f"Bearer {self._token}"
+            )
+        
+        # X-Api-Key for Caddy (https://remna.st/security/caddy-with-custom-path#issuing-api-keys)
+        if self.caddy_token is not None:
+            headers["X-Api-Key"] = self.caddy_token
+        
+        return headers
 
     def _prepare_url(self) -> str:
         if self.base_url.endswith("/"):
-            self.base_url[:-1]
+            self.base_url = self.base_url[:-1]
 
         if not self.base_url.endswith("/api"):
             self.base_url += "/api"
