@@ -20,7 +20,13 @@ This library simplifies working with the API by providing convenient controllers
 
 ## 📦 Installation
 
-Currently, the SDK is available via Git. You can install it directly using `pip`:
+You can install it directly using `pip`:
+
+```bash
+pip install remnawave_api
+```
+
+or with `pip` from git:
 
 ```bash
 pip install git+https://github.com/sm1ky/remnawave-api.git
