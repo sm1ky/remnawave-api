@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from rapid_api_client import Path
+from rapid_api_client import Path, Query
 from rapid_api_client.annotations import PydanticBody
 
 from remnawave_api.models import (
@@ -35,8 +35,19 @@ class UsersController(BaseController):
     @get("/users/v2", response_class=UsersResponseDto)
     async def get_all_users_v2(
         self,
+        size: Annotated[int, Query(100, description="Size of the page")],
+        start: Annotated[int, Query(0, description="Start index of the page")],
     ) -> UsersResponseDto:
-        """Get All Users"""
+        """
+        Get a paginated list of users.
+
+        Args:
+            size (int): Number of users per page.
+            start (int): Index to start pagination from.
+
+        Returns:
+            UsersResponseDto: Paginated users list.
+        """
         ...
 
     @patch("/users/revoke/{uuid}", response_class=UserResponseDto)

@@ -41,6 +41,7 @@ pip install git+https://github.com/sm1ky/remnawave-api.git
 ### Dependencies
 - `orjson` (>=3.10.15, <4.0.0)
 - `rapid-api-client` (==0.6.0)
+- `httpx` (>=0.27.2, <0.28.0)
 
 ## 🚀 Usage
 
