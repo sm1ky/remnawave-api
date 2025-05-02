@@ -10,7 +10,7 @@
 
 A Python SDK client for interacting with the **[Remnawave API](https://remna.st)**.
 This library simplifies working with the API by providing convenient controllers, Pydantic models for requests and responses, and fast serialization with `orjson`. 
-Library checked with Remnawave **[v1.5.7](https://github.com/remnawave/panel/releases/tag/1.5.7)**
+Library checked with Remnawave **[v1.6.0](https://github.com/remnawave/panel/releases/tag/1.6.0)**
 
 ## ✨ Key Features
 
