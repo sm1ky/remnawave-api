@@ -170,8 +170,6 @@ __all__ = [
     "BulkAllUpdateUsersRequestDto",
     "BulkAllUpdateUsersResponseDto",
     "UpdateUserFields",
-    "BulkDeleteUsersByStatusRequestDto",
-    "BulkDeleteUsersRequestDto",
     "BulkResponseDto",
     "BulkUpdateUsersInboundsRequestDto",
     "FindAllApiTokensResponseDto",
