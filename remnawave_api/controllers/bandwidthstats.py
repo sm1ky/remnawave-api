@@ -2,7 +2,7 @@ from typing import Annotated
 
 from rapid_api_client import Query
 
-from remnawave_api.models import NodesUsageResponseDto
+from remnawave_api.models import NodesUsageResponseDto, NodesRealtimeUsageResponseDto
 from remnawave_api.rapid import BaseController, get
 
 
@@ -15,3 +15,11 @@ class BandWidthStatsController(BaseController):
     ) -> NodesUsageResponseDto:
         """Get Nodes Usage By Range"""
         ...
+
+    @get("/nodes/usage/realtime", response_class=NodesRealtimeUsageResponseDto)
+    async def get_nodes_usage_realtime(
+        self,
+    ) -> NodesRealtimeUsageResponseDto:
+        """Get Nodes Usage Realtime"""
+        ...
+        

@@ -14,14 +14,14 @@ class SystemController(BaseController):
         """Get System Stats"""
         ...
 
-    @get("/system/bandwidth", response_class=BandwidthStatisticResponseDto)
+    @get("/system/stats/bandwidth", response_class=BandwidthStatisticResponseDto)
     async def get_bandwidth_stats(
         self,
     ) -> BandwidthStatisticResponseDto:
         """Get System Bandwidth Statistics"""
         ...
 
-    @get("/system/statistics/nodes", response_class=NodesStatisticResponseDto)
+    @get("/system/stats/nodes", response_class=NodesStatisticResponseDto)
     async def get_nodes_statistics(
         self,
     ) -> NodesStatisticResponseDto:

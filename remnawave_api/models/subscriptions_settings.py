@@ -25,7 +25,6 @@ class SubscriptionSettingsResponseDto(BaseModel):
     created_at: datetime = Field(alias="createdAt")
     updated_at: datetime = Field(alias="updatedAt")
 
-
 class UpdateSubscriptionSettingsRequestDto(BaseModel):
     uuid: UUID
     profile_title: Optional[str] = Field(None, serialization_alias="profileTitle")
@@ -42,6 +41,9 @@ class UpdateSubscriptionSettingsRequestDto(BaseModel):
     add_username_to_base_subscription: Optional[bool] = Field(
         None, serialization_alias="addUsernameToBaseSubscription"
     )
+    is_show_custom_remarks: Optional[bool] = Field(
+        None, serialization_alias="isShowCustomRemarks"
+    )
     happ_announce: Annotated[Optional[str], StringConstraints(max_length=200)] = Field(
         None, serialization_alias="happAnnounce"
     )
@@ -54,4 +56,7 @@ class UpdateSubscriptionSettingsRequestDto(BaseModel):
     )
     disabled_users_remarks: Optional[List[str]] = Field(
         None, serialization_alias="disabledUsersRemarks"
+    )
+    custom_response_headers: Optional[dict] = Field(
+        None, serialization_alias="customResponseHeaders"
     )

@@ -19,3 +19,18 @@ class NodeUsageResponseDto(BaseModel):
 
 class NodesUsageResponseDto(BaseModel):
     response: List[NodeUsageResponseDto]
+
+
+class NodeRealtimeUsageResponseDto(BaseModel):
+    node_uuid: UUID = Field(alias="nodeUuid")
+    node_name: str = Field(alias="nodeName")
+    country_code: str = Field(alias="countryCode")
+    download_bytes: float = Field(alias="downloadBytes")
+    upload_bytes: float = Field(alias="uploadBytes")
+    total_bytes: float = Field(alias="totalBytes")
+    download_speed_bps: float = Field(alias="downloadSpeedBps")
+    upload_speed_bps: float = Field(alias="uploadSpeedBps")
+    total_speed_bps: float = Field(alias="totalSpeedBps")
+
+class NodesRealtimeUsageResponseDto(BaseModel):
+    response: List[NodeRealtimeUsageResponseDto]

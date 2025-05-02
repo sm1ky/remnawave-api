@@ -11,7 +11,7 @@ from .auth import (
     RegisterResponseDto,
     StatusResponseDto,
 )
-from .bandwidthstats import NodesUsageResponseDto, NodeUsageResponseDto
+from .bandwidthstats import NodesUsageResponseDto, NodeUsageResponseDto, NodesRealtimeUsageResponseDto, NodeRealtimeUsageResponseDto
 from .hosts import (
     CreateHostRequestDto,
     DeleteHostResponseDto,
@@ -92,6 +92,12 @@ from .users_bulk_actions import (
 )
 from .users_stats import UserUsageByRange, UserUsageByRangeResponseDto
 from .xray_config import ConfigResponseDto
+from .hwid import (
+    CreateHWIDUser,
+    HWIDUserResponseDto,
+    HWIDUserResponseDtoList,
+    HWIDDeleteRequest
+)
 
 __all__ = [
     "CPUStatistic",
@@ -172,4 +178,10 @@ __all__ = [
     "CreateApiTokenResponseDto",
     "CreateApiTokenRequestDto",
     "DeleteApiTokenResponseDto",
+    "NodesRealtimeUsageResponseDto",
+    "NodeRealtimeUsageResponseDto",
+    "CreateHWIDUser",
+    "HWIDUserResponseDto",
+    "HWIDUserResponseDtoList",
+    "HWIDDeleteRequest"
 ]

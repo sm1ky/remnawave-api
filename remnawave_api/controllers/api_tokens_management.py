@@ -14,7 +14,7 @@ from remnawave_api.rapid import BaseController, delete, get, post
 
 
 class APITokensManagementController(BaseController):
-    @post("/tokens/create", response_class=CreateApiTokenResponseDto)
+    @post("/tokens", response_class=CreateApiTokenResponseDto)
     async def create(
         self,
         body: Annotated[CreateApiTokenRequestDto, PydanticBody()],
@@ -22,7 +22,7 @@ class APITokensManagementController(BaseController):
         """Create new API token"""
         ...
 
-    @delete("/tokens/delete/{uuid}", response_class=DeleteApiTokenResponseDto)
+    @delete("/tokens/{uuid}", response_class=DeleteApiTokenResponseDto)
     async def delete(
         self,
         uuid: Annotated[str, Path(description="UUID of the API token")],

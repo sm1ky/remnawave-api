@@ -24,7 +24,7 @@ class UsersController(BaseController):
         """Create User"""
         ...
 
-    @post("/users/update", response_class=UserResponseDto)
+    @patch("/users", response_class=UserResponseDto)
     async def update_user(
         self,
         body: Annotated[UpdateUserRequestDto, PydanticBody()],
@@ -32,11 +32,11 @@ class UsersController(BaseController):
         """Update User"""
         ...
 
-    @get("/users/v2", response_class=UsersResponseDto)
+    @get("/users", response_class=UsersResponseDto)
     async def get_all_users_v2(
         self,
-        start: Annotated[int, Query(description="Index to start pagination from")],
-        size: Annotated[int, Query(description="Number of users per page")],
+        start: Annotated[int, Query(default=0, ge=0, description="Index to start pagination from")],
+        size: Annotated[int, Query(default=25, ge=1, description="Number of users per page")],
     ) -> UsersResponseDto:
         """
         Get users page from the end.
@@ -49,24 +49,8 @@ class UsersController(BaseController):
             UsersResponseDto
         """
         ...
-
-    @patch("/users/revoke/{uuid}", response_class=UserResponseDto)
-    async def revoke_user_subscription(
-        self,
-        uuid: Annotated[str, Path(description="UUID of the user")],
-    ) -> UserResponseDto:
-        """Revoke User Subscription"""
-        ...
-
-    @patch("/users/disable/{uuid}", response_class=UserResponseDto)
-    async def disable_user(
-        self,
-        uuid: Annotated[str, Path(description="UUID of the user")],
-    ) -> UserResponseDto:
-        """Disable User"""
-        ...
-
-    @delete("/users/delete/{uuid}", response_class=DeleteUserResponseDto)
+        
+    @delete("/users/{uuid}", response_class=DeleteUserResponseDto)
     async def delete_user(
         self,
         uuid: Annotated[str, Path(description="UUID of the user")],
@@ -74,7 +58,23 @@ class UsersController(BaseController):
         """Delete User"""
         ...
 
-    @patch("/users/enable/{uuid}", response_class=UserResponseDto)
+    @post("users/{uuid}/actions/revoke", response_class=UserResponseDto)
+    async def revoke_user_subscription(
+        self,
+        uuid: Annotated[str, Path(description="UUID of the user")],
+    ) -> UserResponseDto:
+        """Revoke User Subscription"""
+        ...
+
+    @post("/users/{uuid}/actions/disable", response_class=UserResponseDto)
+    async def disable_user(
+        self,
+        uuid: Annotated[str, Path(description="UUID of the user")],
+    ) -> UserResponseDto:
+        """Disable User"""
+        ...
+
+    @post("/users/{uuid}/actions/enable", response_class=UserResponseDto)
     async def enable_user(
         self,
         uuid: Annotated[str, Path(description="UUID of the user")],
@@ -82,15 +82,23 @@ class UsersController(BaseController):
         """Enable User"""
         ...
 
-    @patch("/users/reset-traffic/{uuid}", response_class=UserResponseDto)
+    @post("/users/{uuid}/actions/reset-traffic", response_class=UserResponseDto)
     async def reset_user_traffic(
         self,
         uuid: Annotated[str, Path(description="UUID of the user")],
     ) -> UserResponseDto:
         """Reset User Traffic"""
         ...
+        
+    @post("/users/{uuid}/actions/activate-all-inbounds", response_class=UserResponseDto)
+    async def activate_all_inbounds(
+        self,
+        uuid: Annotated[str, Path(description="UUID of the user")],
+    ) -> UserResponseDto:
+        """Activate All Inbounds"""
+        ...
 
-    @get("/users/short-uuid/{short_uuid}", response_class=UserResponseDto)
+    @get("/users/by-short-uuid/{short_uuid}", response_class=UserResponseDto)
     async def get_user_by_short_uuid(
         self,
         short_uuid: Annotated[str, Path(description="Short UUID of the user")],
@@ -98,7 +106,7 @@ class UsersController(BaseController):
         """Get User By Short UUID"""
         ...
 
-    @get("/users/sub-uuid/{subscription_uuid}", response_class=UserResponseDto)
+    @get("/users/by-subscription-uuid/{subscription_uuid}", response_class=UserResponseDto)
     async def get_user_by_subscription_uuid(
         self,
         subscription_uuid: Annotated[str, Path(description="UUID of the subscription")],
@@ -106,7 +114,7 @@ class UsersController(BaseController):
         """Get User By Subscription UUID"""
         ...
 
-    @get("/users/uuid/{uuid}", response_class=UserResponseDto)
+    @get("/users/{uuid}", response_class=UserResponseDto)
     async def get_user_by_uuid(
         self,
         uuid: Annotated[str, Path(description="UUID of the user")],
@@ -114,7 +122,7 @@ class UsersController(BaseController):
         """Get User By UUID"""
         ...
 
-    @get("/users/username/{username}", response_class=UserResponseDto)
+    @get("/users/by-username/{username}", response_class=UserResponseDto)
     async def get_user_by_username(
         self,
         username: Annotated[str, Path(description="Username of the user")],
@@ -123,7 +131,7 @@ class UsersController(BaseController):
         ...
 
     @get(
-        "/users/tg/{telegram_id}",
+        "/users/by-telegram-id/{telegram_id}",
         response_class=TelegramUserResponseDto,
     )
     async def get_users_by_telegram_id(
@@ -133,7 +141,7 @@ class UsersController(BaseController):
         """Get Users By Telegram ID"""
         ...
 
-    @get("/users/email/{email}", response_class=EmailUserResponseDto)
+    @get("/users/by-email/{email}", response_class=EmailUserResponseDto)
     async def get_users_by_email(
         self,
         email: Annotated[str, Path(description="Email of the user")],

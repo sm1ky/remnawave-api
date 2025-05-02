@@ -78,7 +78,7 @@ class UsersBulkActionsController(BaseController):
         """Bulk Update All Users"""
         ...
 
-    @patch(
+    @post(
         "/users/bulk/all/reset-traffic",
         response_class=BulkAllResetTrafficUsersResponseDto,
     )

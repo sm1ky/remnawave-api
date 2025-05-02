@@ -12,11 +12,11 @@ from remnawave_api.models import (
     ReorderHostResponseDto,
     UpdateHostRequestDto,
 )
-from remnawave_api.rapid import AttributeBody, BaseController, delete, get, post
+from remnawave_api.rapid import AttributeBody, BaseController, delete, get, post, patch
 
 
 class HostsController(BaseController):
-    @post("/hosts/create", response_class=HostResponseDto)
+    @post("/hosts", response_class=HostResponseDto)
     async def create_host(
         self,
         body: Annotated[CreateHostRequestDto, PydanticBody()],
@@ -24,7 +24,7 @@ class HostsController(BaseController):
         """Create Host"""
         ...
 
-    @post("/hosts/update", response_class=HostResponseDto)
+    @patch("/hosts", response_class=HostResponseDto)
     async def update_host(
         self,
         body: Annotated[UpdateHostRequestDto, PydanticBody()],
@@ -32,14 +32,22 @@ class HostsController(BaseController):
         """Update Host"""
         ...
 
-    @get("/hosts/all", response_class=HostsResponseDto)
+    @get("/hosts", response_class=HostsResponseDto)
     async def get_all_hosts(
         self,
     ) -> HostsResponseDto:
         """Get All Hosts"""
         ...
+        
+    @delete("/hosts/{uuid}", response_class=DeleteHostResponseDto)
+    async def delete_host(
+        self,
+        uuid: Annotated[str, Path(description="UUID of the host")],
+    ) -> DeleteHostResponseDto:
+        """Delete Host"""
+        ...
 
-    @get("/hosts/get-one/{uuid}", response_class=HostResponseDto)
+    @get("/hosts/{uuid}", response_class=HostResponseDto)
     async def get_one_host(
         self,
         uuid: Annotated[str, Path(description="UUID of the host")],
@@ -47,18 +55,10 @@ class HostsController(BaseController):
         """Get One Host"""
         ...
 
-    @post("/hosts/reorder", response_class=ReorderHostResponseDto)
+    @post("/hosts/actions/reorder", response_class=ReorderHostResponseDto)
     async def reorder_hosts(
         self,
         hosts: Annotated[List[ReorderHostRequestDto], AttributeBody()],
     ) -> ReorderHostResponseDto:
         """Reorder Hosts"""
-        ...
-
-    @delete("/hosts/delete/{uuid}", response_class=DeleteHostResponseDto)
-    async def delete_host(
-        self,
-        uuid: Annotated[str, Path(description="UUID of the host")],
-    ) -> DeleteHostResponseDto:
-        """Delete Host"""
         ...

@@ -4,12 +4,12 @@ from rapid_api_client.annotations import Path, PydanticBody
 
 from remnawave_api.enums import TemplateType
 from remnawave_api.models import TemplateResponseDto, UpdateTemplateRequestDto
-from remnawave_api.rapid import BaseController, get, post
+from remnawave_api.rapid import BaseController, get, put
 
 
 class SubscriptionsTemplateController(BaseController):
     @get(
-        "/subscription-templates/get-template/{template_type}",
+        "/subscription-templates/{template_type}",
         response_class=TemplateResponseDto,
     )
     async def get_template(
@@ -19,8 +19,8 @@ class SubscriptionsTemplateController(BaseController):
         """Get Template"""
         ...
 
-    @post(
-        "/subscription-templates/update-template",
+    @put(
+        "/subscription-templates",
         response_class=TemplateResponseDto,
     )
     async def update_template(

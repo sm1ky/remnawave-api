@@ -8,7 +8,7 @@ from remnawave_api.rapid import BaseController, get
 
 class UsersStatsController(BaseController):
     @get(
-        "/users/stats/usage/range/{uuid}",
+        "/users/stats/usage/{uuid}/range",
         response_class=UserUsageByRangeResponseDto,
     )
     async def get_user_usage_by_range(

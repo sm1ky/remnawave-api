@@ -6,19 +6,19 @@ from remnawave_api.models import (
     SubscriptionSettingsResponseDto,
     UpdateSubscriptionSettingsRequestDto,
 )
-from remnawave_api.rapid import BaseController, get, post
+from remnawave_api.rapid import BaseController, get, patch
 
 
 class SubscriptionsSettingsController(BaseController):
-    @get("/subscription-settings/get", response_class=SubscriptionSettingsResponseDto)
+    @get("/subscription-settings", response_class=SubscriptionSettingsResponseDto)
     async def get_settings(
         self,
     ) -> SubscriptionSettingsResponseDto:
         """Get Subscription Settings"""
         ...
 
-    @post(
-        "/subscription-settings/update",
+    @patch(
+        "/subscription-settings",
         response_class=SubscriptionSettingsResponseDto,
     )
     async def update_settings(
