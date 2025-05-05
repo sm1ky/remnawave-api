@@ -178,3 +178,5 @@ test.py
 docs/
 openapi/
 .DS_Store
+requirements.txt 
+requirements.in

@@ -12,8 +12,8 @@ dependencies = [
     "rapid-api-client (==0.6.0)",
     "orjson (>=3.10.15,<4.0.0)",
     "httpx (>=0.27.2,<0.28.0)",
-    "pydantic-core (==2.33.1)",
-    "pydantic[email]",
+    "pydantic[email]>=2.9.2,<3.0.0",
+    "pydantic-core>=2.33.1,<2.34.0",
 ]
 keywords = ["remnawave", "api", "sdk", "proxy", "httpx", "async", "xray"]
 classifiers = [
