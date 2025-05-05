@@ -14,6 +14,7 @@ dependencies = [
     "httpx (>=0.27.2,<0.28.0)",
     "pydantic[email]>=2.9.2,<3.0.0",
     "pydantic-core>=2.33.1,<2.34.0",
+    "pydantic>=2.9.2,<3.0.0",
 ]
 keywords = ["remnawave", "api", "sdk", "proxy", "httpx", "async", "xray"]
 classifiers = [
