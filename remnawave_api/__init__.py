@@ -71,7 +71,7 @@ class RemnawaveSDK:
         self.users_bulk_actions = UsersBulkActionsController(self._client)
         self.users_stats = UsersStatsController(self._client)
         self.xray_config = XrayConfigController(self._client)
-        self.webhook_utility = WebhookUtility(self._client)
+        self.webhook_utility = WebhookUtility()
         self.hwid = HWIDUserController(self._client)
 
     def _validate_params(self) -> None:
