@@ -27,14 +27,11 @@ You can install it directly using `pip`:
 pip install remnawave_api
 ```
 
-or with `pip` from git:
+If you need dev version:
 
 ```bash
-pip install git+https://github.com/sm1ky/remnawave-api.git
+pip install git+https://github.com/sm1ky/remnawave-api.git@development
 ```
-
-## 🔎 View on pypi
-[Open](https://pypi.python.org/pypi/remnawave-api)
 
 ---
 
