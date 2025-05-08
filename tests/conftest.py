@@ -14,7 +14,6 @@ REMNAWAVE_INBOUND_UUID = os.getenv("REMNAWAVE_INBOUND_UUID")
 REMNAWAVE_USER_UUID = os.getenv("REMNAWAVE_USER_UUID")
 REMNAWAVE_SHORT_UUID = os.getenv("REMNAWAVE_SHORT_UUID")
 
-
 @pytest.fixture
 async def remnawave() -> RemnawaveSDK:
     assert REMNAWAVE_TOKEN
@@ -42,4 +41,5 @@ async def remnawave() -> RemnawaveSDK:
     assert sdk.users_bulk_actions is not None
     assert sdk.users_stats is not None
     assert sdk.xray_config is not None
+    assert sdk.hwid is not None
     return sdk

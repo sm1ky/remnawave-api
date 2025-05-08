@@ -1,15 +1,14 @@
 from typing import Annotated
 from uuid import UUID
 
-from rapid_api_client import PydanticBody
-
 from remnawave_api.models import (
     HWIDUserResponseDto,
     HWIDUserResponseDtoList,
     CreateHWIDUser,
     HWIDDeleteRequest
 )
-from remnawave_api.rapid import AttributeBody, BaseController, post
+from rapid_api_client import Path, PydanticBody
+from remnawave_api.rapid import AttributeBody, BaseController, post, get
 
 
 class HWIDUserController(BaseController):
@@ -29,10 +28,10 @@ class HWIDUserController(BaseController):
         """Delete a user HWID device"""
         ...
     
-    @post("/hwid/devices/{uuid}", response_class=HWIDUserResponseDto)
+    @get("/hwid/devices/{uuid}", response_class=HWIDUserResponseDtoList)
     async def get_hwid_user(
         self,
-        uuid: Annotated[UUID, AttributeBody()],
-    ) -> HWIDUserResponseDto:
+        uuid: Annotated[str, Path(description="UUID of the User")],
+    ) -> HWIDUserResponseDtoList:
         """Get a user HWID device"""
         ...
