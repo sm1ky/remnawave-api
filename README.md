@@ -35,6 +35,13 @@ pip install git+https://github.com/sm1ky/remnawave-api.git@development
 
 ---
 
+## 🫥 Compatible versions
+
+| Contract Version | Remnawave Panel Version |
+| ---------------- | ----------------------- |
+| 1.1.0            | 1.6.0                   |
+| 1.0.8            | 1.5.7                   |
+
 ### Dependencies
 - `orjson` (>=3.10.15, <4.0.0)
 - `rapid-api-client` (==0.6.0)
