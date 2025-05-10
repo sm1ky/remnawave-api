@@ -40,11 +40,6 @@ jobs:
         if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
         run: python -m build
 
-      - name: Inspect METADATA (for debug)
-        run: |
-          unzip dist/*.whl -d temp/
-          cat temp/*.dist-info/METADATA
-
       - name: Publish package
         if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
         uses: pypa/gh-action-pypi-publish@v1.12.4
