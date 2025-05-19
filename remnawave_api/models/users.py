@@ -28,7 +28,7 @@ class HappCrypto(BaseModel):
 
 class CreateUserRequestDto(BaseModel):
     username: Annotated[
-        str, StringConstraints(pattern=r"^[a-zA-Z0-9_-]+$", min_length=6, max_length=34)
+        str, StringConstraints(pattern=r"^[a-zA-Z0-9_-]+$", min_length=6, max_length=36)
     ]
     status: Optional[UserStatus] = None
     subscription_uuid: Optional[str] = Field(
