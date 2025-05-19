@@ -17,11 +17,16 @@ class SubscriptionSettingsResponseDto(BaseModel):
     add_username_to_base_subscription: bool = Field(
         alias="addUsernameToBaseSubscription"
     )
+    show_custom_remarks: bool = Field(alias="isShowCustomRemarks")
     happ_announce: Optional[str] = Field(None, alias="happAnnounce")
     happ_routing: Optional[str] = Field(None, alias="happRouting")
     expired_users_remarks: List[str] = Field(alias="expiredUsersRemarks")
     limited_users_remarks: List[str] = Field(alias="limitedUsersRemarks")
     disabled_users_remarks: List[str] = Field(alias="disabledUsersRemarks")
+    custom_response_headers: Optional[dict] = Field(
+        None, alias="customResponseHeaders"
+    )
+    randomize_hosts: bool = Field(alias="randomizeHosts")
     created_at: datetime = Field(alias="createdAt")
     updated_at: datetime = Field(alias="updatedAt")
 
@@ -60,3 +65,4 @@ class UpdateSubscriptionSettingsRequestDto(BaseModel):
     custom_response_headers: Optional[dict] = Field(
         None, serialization_alias="customResponseHeaders"
     )
+    randomize_hosts: Optional[bool] = Field(None, serialization_alias="randomizeHosts")
