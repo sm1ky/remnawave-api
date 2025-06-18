@@ -22,7 +22,8 @@ class HWIDUserResponseDto(BaseModel):
     updated_at: str = Field(alias="updatedAt")
     
 class HWIDUserResponseDtoList(BaseModel):
-    response: List[HWIDUserResponseDto]
+    devices: List[HWIDUserResponseDto]
+    total: float
     
 class HWIDDeleteRequest(BaseModel):
     hwid: str

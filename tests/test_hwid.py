@@ -17,7 +17,7 @@ new_hwid = str(uuid.uuid4())
 async def test_get_hwid_user(remnawave):
     hwid = await remnawave.hwid.get_hwid_user(uuid=REMNAWAVE_USER_UUID)
     assert isinstance(hwid, HWIDUserResponseDtoList)
-    assert hwid.response is not None
+    assert hwid.devices is not None
 
 
 @pytest.mark.asyncio
@@ -32,7 +32,7 @@ async def test_add_hwid_to_user(remnawave):
     )
     response = await remnawave.hwid.add_hwid_to_users(body=create_request)
     assert isinstance(response, HWIDUserResponseDtoList)
-    assert any(item.hwid == new_hwid for item in response.response)
+    assert any(item.hwid == new_hwid for item in response.devices)
 
 
 @pytest.mark.asyncio
@@ -43,4 +43,4 @@ async def test_delete_hwid_user(remnawave):
     )
     response = await remnawave.hwid.delete_hwid_to_user(body=delete_request)
     assert isinstance(response, HWIDUserResponseDtoList)
-    assert not any(item.hwid == new_hwid for item in response.response)
+    assert not any(item.hwid == new_hwid for item in response.devices)
