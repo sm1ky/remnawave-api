@@ -127,4 +127,4 @@ This SDK was originally developed by [@kesevone](https://github.com/kesevone) fo
 
 Previously maintained by [@sm1ky](https://github.com/sm1ky) at [`sm1ky/remnawave-api`](https://github.com/sm1ky/remnawave-api).
 
-Now officially maintained by the Remnawave team at [`remnawave/python-sdk`](https://github.com/remnawave/python-sdk).
+Now officially maintained by the Remnawave Community at [`remnawave/python-sdk`](https://github.com/remnawave/python-sdk).
