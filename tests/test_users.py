@@ -121,15 +121,15 @@ async def test_users(remnawave) -> None:
     assert update_user.description == update_description
 
     # Temporarily disabled, error in backend
-    # revoke_user_subscription = await remnawave.users.revoke_user_subscription(
-    #     uuid=string_uuid,
-    #     # body=RevokeUserRequestDto(
-    #     #     short_uuid="fokfaa"
-    #     # )
-    # )
-    # assert isinstance(revoke_user_subscription, UserResponseDto)
-    # assert revoke_user_subscription.uuid == create_user.uuid
-    # assert revoke_user_subscription.short_uuid != create_user.short_uuid
+    revoke_user_subscription = await remnawave.users.revoke_user_subscription(
+        uuid=string_uuid,
+        # body=RevokeUserRequestDto(
+        #     short_uuid="fokfaa"
+        # )
+    )
+    assert isinstance(revoke_user_subscription, UserResponseDto)
+    assert revoke_user_subscription.uuid == create_user.uuid
+    assert revoke_user_subscription.short_uuid != create_user.short_uuid
 
     # Test get user accessible nodes
     try:
