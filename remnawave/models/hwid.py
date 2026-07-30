@@ -27,6 +27,7 @@ class HwidDeviceDto(BaseModel):
     os_version: Optional[str] = Field(None, alias="osVersion")
     device_model: Optional[str] = Field(None, alias="deviceModel")
     user_agent: Optional[str] = Field(None, alias="userAgent")
+    request_ip: Optional[str] = Field(None, alias="requestIp")
     created_at: datetime = Field(alias="createdAt")
     updated_at: datetime = Field(alias="updatedAt")
 
@@ -68,7 +69,7 @@ class HwidStats(BaseModel):
 
 class HwidStatisticsData(BaseModel):
     by_platform: List[PlatformStatItem] = Field(alias="byPlatform")
-    by_app: List[AppStatItem] = Field(alias="byApp")
+    by_app: List[AppStatItem] = Field(default_factory=list, alias="byApp")
     stats: HwidStats
 
 

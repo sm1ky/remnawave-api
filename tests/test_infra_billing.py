@@ -130,6 +130,7 @@ async def test_infra_billing_nodes(remnawave) -> None:
             CreateInfraBillingNodeRequestDto(
                 node_uuid=available_node.uuid,
                 provider_uuid=provider.uuid,
+                name="SDK Test Billing Node",
                 next_billing_at=next_billing
             )
         )
@@ -194,6 +195,7 @@ async def test_infra_billing_complete_workflow(remnawave) -> None:
                 CreateInfraBillingNodeRequestDto(
                     node_uuid=available_node.uuid,
                     provider_uuid=create_provider.uuid,
+                    name="SDK Test Billing Node",
                     next_billing_at=next_billing
                 )
             )

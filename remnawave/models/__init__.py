@@ -215,6 +215,7 @@ from .nodes import (
     NodesBulkActionsRequestDto,
     NodesBulkActionsResponseDto,
     BulkNodesUpdateRequestDto,
+    BulkNodesUpdateFieldsDto,
     BulkNodesUpdateResponseDto,
 )
 from .nodes_usage_history import (
@@ -430,7 +431,6 @@ from .passkeys import (
     VerifyPasskeyRegistrationResponseDto,
 )
 from .metadata import (
-    GetMetadataResponseDto,
     GetUserMetadataResponseDto,
     UpsertUserMetadataRequestBodyDto,
     UpsertUserMetadataResponseDto,
@@ -606,6 +606,7 @@ __all__ = [
     "NodesBulkActionsRequestDto",
     "NodesBulkActionsResponseDto",
     "BulkNodesUpdateRequestDto",
+    "BulkNodesUpdateFieldsDto",
     "BulkNodesUpdateResponseDto",
     # Hosts models
     "CreateHostRequestDto",

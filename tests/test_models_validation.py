@@ -195,20 +195,36 @@ class TestCreateInfraBillingNodeRequestDto:
         dto = CreateInfraBillingNodeRequestDto(
             node_uuid=uuid4(),
             provider_uuid=uuid4(),
+            name="My server",
             next_billing_at=now,
         )
         assert dto.next_billing_at == now
 
-    def test_name_supported_and_node_uuid_optional(self):
-        """name was added and node_uuid became nullable in Remnawave API v2.8.0."""
+    def test_name_and_node_uuid_required(self):
+        """name and node_uuid are required in the Remnawave API v2.8.1 contract."""
         now = datetime.now(tz=timezone.utc)
+        # node_uuid missing -> error
+        with pytest.raises(ValidationError):
+            CreateInfraBillingNodeRequestDto(
+                provider_uuid=uuid4(),
+                name="My server",
+                next_billing_at=now,
+            )
+        # name missing -> error
+        with pytest.raises(ValidationError):
+            CreateInfraBillingNodeRequestDto(
+                provider_uuid=uuid4(),
+                node_uuid=uuid4(),
+                next_billing_at=now,
+            )
+        # all required fields provided -> ok
         dto = CreateInfraBillingNodeRequestDto(
             provider_uuid=uuid4(),
+            node_uuid=uuid4(),
             name="My server",
             next_billing_at=now,
         )
         assert dto.name == "My server"
-        assert dto.node_uuid is None
 
 
 class TestResponseRulesSettings:

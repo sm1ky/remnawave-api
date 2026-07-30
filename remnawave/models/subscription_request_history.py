@@ -1,15 +1,14 @@
 from datetime import datetime
 from typing import List, Optional
-from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 
 class SubscriptionRequestHistoryRecord(BaseModel):
     id: int
-    user_uuid: UUID = Field(alias="userUuid")
-    request_ip: Optional[str] = Field(alias="requestIp")
-    user_agent: Optional[str] = Field(alias="userAgent")
+    user_id: int = Field(alias="userId")
+    request_ip: Optional[str] = Field(None, alias="requestIp")
+    user_agent: Optional[str] = Field(None, alias="userAgent")
     request_at: datetime = Field(alias="requestAt")
 
 

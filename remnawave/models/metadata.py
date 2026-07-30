@@ -6,11 +6,6 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 
-class GetMetadataResponseDto(BaseModel):
-    """Get metadata response"""
-    metadata: Optional[Dict[str, Any]] = None
-
-
 class GetUserMetadataResponseDto(BaseModel):
     """Get user metadata response"""
     metadata: Optional[Dict[str, Any]] = None

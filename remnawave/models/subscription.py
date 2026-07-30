@@ -34,12 +34,12 @@ class UserTrafficDto(BaseModel):
 
 class UserResponseDto(BaseModel):
     uuid: UUID
+    id: Optional[int] = None
     short_uuid: str = Field(alias="shortUuid")
     username: str
     status: UserStatus = Field(default=UserStatus.ACTIVE)
+    external_squad_uuid: Optional[UUID] = Field(None, alias="externalSquadUuid")
     user_traffic: UserTrafficDto = Field(alias="userTraffic")
-    sub_last_user_agent: Optional[str] = Field(None, alias="subLastUserAgent")
-    sub_last_opened_at: Optional[datetime] = Field(None, alias="subLastOpenedAt")
     expire_at: datetime = Field(alias="expireAt")
     sub_revoked_at: Optional[datetime] = Field(None, alias="subRevokedAt")
     last_traffic_reset_at: Optional[datetime] = Field(None, alias="lastTrafficResetAt")
@@ -89,7 +89,8 @@ class ConvertedUserInfo(BaseModel):
     traffic_limit: str = Field(alias="trafficLimit")
     traffic_used: str = Field(alias="trafficUsed")
     lifetime_traffic_used: str = Field(alias="lifetimeTrafficUsed")
-    is_hwid_limited: bool = Field(alias="isHwidLimited")
+    hwid_checkup: Optional[Dict[str, Any]] = Field(None, alias="hwidCheckup")
+    is_hwid_limited: Optional[bool] = Field(None, alias="isHwidLimited")
 
 
 class Passwords(BaseModel):
@@ -166,7 +167,14 @@ class RawSubscriptionResponse(BaseModel):
     user: UserResponseDto
     converted_user_info: ConvertedUserInfo = Field(alias="convertedUserInfo")
     headers: Dict[str, str]
-    raw_hosts: Optional[List[RawHost]] = Field(None, alias="rawHosts")
+    resolved_proxy_configs: Optional[List[Dict[str, Any]]] = Field(
+        None, alias="resolvedProxyConfigs"
+    )
+
+    @property
+    def raw_hosts(self) -> Optional[List[Dict[str, Any]]]:
+        """Backward compatibility (renamed to `resolved_proxy_configs`/`resolvedProxyConfigs` in v2.8.x)"""
+        return self.resolved_proxy_configs
 
 
 class GetRawSubscriptionByShortUuidResponseDto(RawSubscriptionResponse):

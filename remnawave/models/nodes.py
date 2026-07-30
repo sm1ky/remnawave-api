@@ -5,6 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, RootModel
 
 from remnawave.models.internal_squads import InboundsDto
+from remnawave.models.webhook import NodeSystemDto, NodeVersionsDto
 
 
 class ExcludedInbounds(BaseModel):
@@ -70,9 +71,6 @@ class CreateNodeRequestDto(BaseModel):
     traffic_reset_day: Optional[int] = Field(
         None, serialization_alias="trafficResetDay", ge=1, le=31
     )
-    excluded_inbounds: Optional[List[UUID]] = Field(
-        None, serialization_alias="excludedInbounds"
-    )
     country_code: Annotated[Optional[str], StringConstraints(max_length=2)] = Field(
         "XX",
         serialization_alias="countryCode"
@@ -120,9 +118,6 @@ class UpdateNodeRequestDto(BaseModel):
     traffic_reset_day: Optional[float] = Field(
         None, serialization_alias="trafficResetDay", ge=1, le=31
     )
-    excluded_inbounds: Optional[List[UUID]] = Field(
-        None, serialization_alias="excludedInbounds"
-    )
     country_code: Annotated[Optional[str], StringConstraints(max_length=2)] = Field(
         None, serialization_alias="countryCode"
     )
@@ -166,8 +161,6 @@ class NodeResponseDto(BaseModel):
     is_connecting: bool = Field(alias="isConnecting")
     last_status_change: Optional[datetime] = Field(None, alias="lastStatusChange")
     last_status_message: Optional[str] = Field(None, alias="lastStatusMessage")
-    xray_version: Optional[str] = Field(None, alias="xrayVersion")
-    node_version: Optional[str] = Field(None, alias="nodeVersion")
     xray_uptime: float = Field(0, alias="xrayUptime")
     is_traffic_tracking_active: bool = Field(alias="isTrafficTrackingActive")
     traffic_reset_day: Optional[int] = Field(None, alias="trafficResetDay")
@@ -181,9 +174,8 @@ class NodeResponseDto(BaseModel):
     node_consumption_multiplier: Optional[float] = Field(None, alias="nodeConsumptionMultiplier")
     note: Optional[str] = Field(None, alias="note")
     proxy_url: Optional[str] = Field(None, alias="proxyUrl")
-    cpu_count: Optional[int] = Field(None, alias="cpuCount")
-    cpu_model: Optional[str] = Field(None, alias="cpuModel")
-    total_ram: Optional[str] = Field(None, alias="totalRam")
+    system: Optional[NodeSystemDto] = Field(None, alias="system")
+    versions: Optional[NodeVersionsDto] = Field(None, alias="versions")
     created_at: datetime = Field(alias="createdAt")
     updated_at: datetime = Field(alias="updatedAt")
     config_profile: NodeConfigProfileDto = Field(alias="configProfile")
@@ -191,6 +183,31 @@ class NodeResponseDto(BaseModel):
     provider: Optional[NodeProviderDto] = None
     tags: List[str] = Field(default_factory=list, alias="tags")
     active_plugin_uuid: Optional[UUID] = Field(None, alias="activePluginUuid")
+
+    @property
+    def xray_version(self) -> Optional[str]:
+        """Backward compatibility (moved to `versions.xray` in v2.8.x)"""
+        return self.versions.xray if self.versions else None
+
+    @property
+    def node_version(self) -> Optional[str]:
+        """Backward compatibility (moved to `versions.node` in v2.8.x)"""
+        return self.versions.node if self.versions else None
+
+    @property
+    def cpu_count(self) -> Optional[int]:
+        """Backward compatibility (moved to `system.info.cpus` in v2.8.x)"""
+        return self.system.info.cpus if self.system and self.system.info else None
+
+    @property
+    def cpu_model(self) -> Optional[str]:
+        """Backward compatibility (moved to `system.info.cpu_model` in v2.8.x)"""
+        return self.system.info.cpu_model if self.system and self.system.info else None
+
+    @property
+    def total_ram(self) -> Optional[float]:
+        """Backward compatibility (moved to `system.info.memory_total` in v2.8.x)"""
+        return self.system.info.memory_total if self.system and self.system.info else None
 
 
 class CreateNodeResponseDto(NodeResponseDto):
@@ -326,9 +343,21 @@ class NodesBulkActionsResponseDto(BaseModel):
     event_sent: bool = Field(alias="eventSent")
 
 
-class BulkNodesUpdateRequestDto(NodesBulkActionsRequestDto):
-    """OpenAPI alias for bulk nodes update request"""
-    pass
+class BulkNodesUpdateFieldsDto(BaseModel):
+    """Fields to update in a bulk nodes update request"""
+    country_code: Optional[str] = Field(None, serialization_alias="countryCode")
+    consumption_multiplier: Optional[float] = Field(None, serialization_alias="consumptionMultiplier")
+    node_consumption_multiplier: Optional[float] = Field(None, serialization_alias="nodeConsumptionMultiplier")
+    provider_uuid: Optional[UUID] = Field(None, serialization_alias="providerUuid")
+    tags: Optional[List[str]] = Field(None, serialization_alias="tags")
+    active_plugin_uuid: Optional[UUID] = Field(None, serialization_alias="activePluginUuid")
+    note: Optional[str] = Field(None, serialization_alias="note")
+
+
+class BulkNodesUpdateRequestDto(BaseModel):
+    """Bulk nodes update request: node UUIDs + fields to update"""
+    uuids: List[UUID] = Field(min_length=1)
+    fields: BulkNodesUpdateFieldsDto
 
 
 class BulkNodesUpdateResponseDto(NodesBulkActionsResponseDto):

@@ -19,11 +19,15 @@ class InfraBillingHistoryStatsDto(BaseModel):
     total_bills: float = Field(alias="totalBills")
 
 
-class InfraBillingNodeSimpleDto(BaseModel):
-    """Упрощенная модель узла биллинга для провайдера"""
+class InfraBillingNodeDetailsDto(BaseModel):
     node_uuid: UUID = Field(alias="nodeUuid")
-    name: str
     country_code: str = Field(alias="countryCode")
+
+
+class InfraBillingNodeSimpleDto(BaseModel):
+    """Billing node inside a provider (spec: {name, details})"""
+    name: str
+    details: InfraBillingNodeDetailsDto
 
 
 class InfraProviderDto(BaseModel):
@@ -43,15 +47,24 @@ class NodeDto(BaseModel):
     country_code: str = Field(alias="countryCode")
 
 
+class InfraBillingHistoryProviderDto(BaseModel):
+    uuid: UUID
+    name: str
+    favicon_link: Optional[str] = Field(None, alias="faviconLink")
+
+
 class InfraBillingHistoryDto(BaseModel):
     uuid: UUID
-    node_uuid: UUID = Field(alias="nodeUuid")
     provider_uuid: UUID = Field(alias="providerUuid")
     amount: float
+    billed_at: Optional[datetime] = Field(None, alias="billedAt")
+    provider: Optional[InfraBillingHistoryProviderDto] = None
+    # Legacy/optional fields (not part of the 2.8.1 contract)
+    node_uuid: Optional[UUID] = Field(None, alias="nodeUuid")
     description: Optional[str] = None
-    payment_date: datetime = Field(alias="paymentDate")
-    created_at: datetime = Field(alias="createdAt")
-    updated_at: datetime = Field(alias="updatedAt")
+    payment_date: Optional[datetime] = Field(None, alias="paymentDate")
+    created_at: Optional[datetime] = Field(None, alias="createdAt")
+    updated_at: Optional[datetime] = Field(None, alias="updatedAt")
 
 
 class InfraBillingNodeDto(BaseModel):
@@ -127,28 +140,28 @@ class CreateInfraBillingHistoryRecordRequestDto(BaseModel):
     billed_at: datetime = Field(serialization_alias="billedAt")
 
 
-class CreateInfraBillingHistoryRecordResponseDto(InfraBillingHistoryDto):
-    pass
-
-
 class InfraBillingHistoryData(BaseModel):
     records: List[InfraBillingHistoryDto]
     total: float
+
+
+class CreateInfraBillingHistoryRecordResponseDto(InfraBillingHistoryData):
+    pass
 
 
 class GetInfraBillingHistoryRecordsResponseDto(InfraBillingHistoryData):
     pass
 
 
-class DeleteInfraBillingHistoryRecordByUuidResponseDto(BaseModel):
-    is_deleted: bool = Field(alias="isDeleted")
+class DeleteInfraBillingHistoryRecordByUuidResponseDto(InfraBillingHistoryData):
+    pass
 
 
 # Billing Nodes models
 class CreateInfraBillingNodeRequestDto(BaseModel):
     provider_uuid: UUID = Field(serialization_alias="providerUuid")
-    node_uuid: Optional[UUID] = Field(None, serialization_alias="nodeUuid")
-    name: Optional[str] = Field(None, serialization_alias="name", min_length=1, max_length=255)
+    node_uuid: UUID = Field(serialization_alias="nodeUuid")
+    name: str = Field(serialization_alias="name", min_length=1, max_length=255)
     next_billing_at: datetime = Field(serialization_alias="nextBillingAt")
 
 

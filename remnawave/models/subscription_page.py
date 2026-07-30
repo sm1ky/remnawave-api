@@ -122,8 +122,6 @@ class SubpageConfigData(BaseModel):
     webpage_allowed: bool = Field(alias="webpageAllowed")
 
 
-class GetSubpageConfigByShortUuidResponseDto(BaseModel):
+class GetSubpageConfigByShortUuidResponseDto(SubpageConfigData):
     """Response for getting subpage config by short UUID"""
-    model_config = ConfigDict(populate_by_name=True)
-    
-    response: SubpageConfigData
+    pass

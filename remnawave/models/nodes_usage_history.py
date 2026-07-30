@@ -10,7 +10,7 @@ class NodeActiveSquadDto(BaseModel):
 
 class NodeInfoDto(BaseModel):
     uuid: UUID
-    name: str
+    name: str = Field(alias="nodeName")
     country_code: str = Field(alias="countryCode")
     config_profile_name: str = Field(alias="configProfileName")
     config_profile_uuid: UUID = Field(alias="configProfileUuid")
@@ -18,7 +18,12 @@ class NodeInfoDto(BaseModel):
 
 class GetUserAccessibleNodesResponse(BaseModel):
     user_uuid: UUID = Field(alias="userUuid")
-    nodes: List[NodeInfoDto] = Field(default_factory=list)
+    active_nodes: List[NodeInfoDto] = Field(default_factory=list, alias="activeNodes")
+
+    @property
+    def nodes(self) -> List[NodeInfoDto]:
+        """Backward compatibility (renamed to `active_nodes`/`activeNodes` in v2.8.x)"""
+        return self.active_nodes
 
 class GetUserAccessibleNodesResponseDto(GetUserAccessibleNodesResponse):
     pass

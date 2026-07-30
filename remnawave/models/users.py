@@ -139,8 +139,6 @@ class UserResponseDto(BaseModel):
     ss_password: str = Field(alias="ssPassword")
     last_trigger_threshold: int = Field(0, alias="lastTriggeredThreshold")
     sub_revoked_at: Optional[datetime] = Field(None, alias="subRevokedAt")
-    sub_last_user_agent: Optional[str] = Field(None, alias="subLastUserAgent")
-    sub_last_opened_at: Optional[datetime] = Field(None, alias="subLastOpenedAt")
     last_traffic_reset_at: Optional[datetime] = Field(None, alias="lastTrafficResetAt")
     created_at: datetime = Field(alias="createdAt")
     updated_at: datetime = Field(alias="updatedAt")
@@ -222,10 +220,10 @@ class ResolveUserResponseDto(BaseModel):
 class SubscriptionRequestRecord(BaseModel):
     """Subscription request history record"""
     id: int
-    user_uuid: UUID = Field(alias="userUuid")
+    user_id: int = Field(alias="userId")
     request_at: datetime = Field(alias="requestAt")
-    request_ip: Optional[str] = Field(alias="requestIp")
-    user_agent: Optional[str] = Field(alias="userAgent")
+    request_ip: Optional[str] = Field(None, alias="requestIp")
+    user_agent: Optional[str] = Field(None, alias="userAgent")
 
 
 class SubscriptionRequestsResponseData(BaseModel):
