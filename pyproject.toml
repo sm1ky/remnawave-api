@@ -1,5 +1,5 @@
 [project]
-name = "remnawave"
+name = "remnawave-api"
 version = "2.8.0"
 description = "A Python SDK for interacting with the Remnawave API v2.8.0."
 authors = [
@@ -31,10 +31,13 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/remnawave/python-sdk"
+Homepage = "https://github.com/sm1ky/remnawave-api"
 "Panel Page" = "https://remna.st/"
 "Community Chat" = "https://t.me/+xQs17zMzwCY1NzYy"
 "Update Channel" = "https://t.me/remnawave"
+
+[tool.poetry]
+packages = [{ include = "remnawave" }]
 
 [tool.poetry.group.test.dependencies]
 ruff = "^0.4.4"

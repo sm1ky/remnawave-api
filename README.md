@@ -1,47 +1,30 @@
 # Remnawave Python SDK
 
-> **📢 Repository Migration Notice**
-> 
-> This repository has been moved from [`sm1ky/remnawave-api`](https://github.com/sm1ky/remnawave-api) to [`remnawave/python-sdk`](https://github.com/remnawave/python-sdk).
-> 
-> **PyPI Package Migration:**
-> - **Legacy versions (≤1.x)**: Available at [`remnawave_api`](https://pypi.org/project/remnawave_api/) *(deprecated)*
-> - **New versions (≥2.x)**: Available at [`remnawave`](https://pypi.org/project/remnawave/)
-> 
-> Please update your dependencies to use the new package name for future updates.
-
-[![Stars](https://img.shields.io/github/stars/remnawave/python-sdk.svg?style=social)](https://github.com/remnawave/python-sdk/stargazers)
-[![Forks](https://img.shields.io/github/forks/remnawave/python-sdk.svg?style=social)](https://github.com/remnawave/python-sdk/network/members)
-[![Issues](https://img.shields.io/github/issues/remnawave/python-sdk.svg)](https://github.com/remnawave/python-sdk/issues)
+[![Stars](https://img.shields.io/github/stars/sm1ky/remnawave-api.svg?style=social)](https://github.com/sm1ky/remnawave-api/stargazers)
+[![Forks](https://img.shields.io/github/forks/sm1ky/remnawave-api.svg?style=social)](https://github.com/sm1ky/remnawave-api/network/members)
+[![Issues](https://img.shields.io/github/issues/sm1ky/remnawave-api.svg)](https://github.com/sm1ky/remnawave-api/issues)
 [![Supported python versions](https://img.shields.io/pypi/pyversions/remnawave.svg)](https://pypi.python.org/pypi/remnawave)
 [![Downloads](https://img.shields.io/pypi/dm/remnawave.svg)](https://pypi.python.org/pypi/remnawave)
 [![PyPi Package Version](https://img.shields.io/pypi/v/remnawave)](https://pypi.python.org/pypi/remnawave)
-[![Publish Python Package](https://github.com/remnawave/python-sdk/actions/workflows/upload.yml/badge.svg?branch=production)](https://github.com/remnawave/python-sdk/actions/workflows/upload.yml)
+[![Publish Python Package](https://github.com/sm1ky/remnawave-api/actions/workflows/upload.yml/badge.svg?branch=production)](https://github.com/sm1ky/remnawave-api/actions/workflows/upload.yml)
 
 A Python SDK client for interacting with the **[Remnawave API](https://remna.st)**.
 This library simplifies working with the API by providing convenient controllers, Pydantic models for requests and responses, and fast serialization with `orjson`. 
 
 ## 📦 Installation
 
-### New Package (Recommended)
+### Package (Recommended)
 Install the latest version from the new PyPI package:
 
 ```bash
-pip install remnawave
-```
-
-### Legacy Package (Deprecated)
-If you need older versions (≤1.x), use the legacy package:
-
-```bash
-pip install remnawave_api  # Deprecated - use 'remnawave' instead
+pip install remnawave_api
 ```
 
 ### Development Version
 If you need the development version:
 
 ```bash
-pip install git+https://github.com/remnawave/python-sdk.git@development
+pip install git+https://github.com/sm1ky/remnawave-api.git@development
 ```
 
 ---
@@ -124,6 +107,4 @@ if __name__ == "__main__":
 
 This SDK was originally developed by [@kesevone](https://github.com/kesevone) for integration with Remnawave's API.
 
-Previously maintained by [@sm1ky](https://github.com/sm1ky) at [`sm1ky/remnawave-api`](https://github.com/sm1ky/remnawave-api).
-
-Now officially maintained by the Remnawave Community at [`remnawave/python-sdk`](https://github.com/remnawave/python-sdk).
+Maintained by [@sm1ky](https://github.com/sm1ky) at [`sm1ky/remnawave-api`](https://github.com/sm1ky/remnawave-api).
