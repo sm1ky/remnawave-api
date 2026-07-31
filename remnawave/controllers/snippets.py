@@ -36,7 +36,7 @@ class SnippetsController(BaseController):
         """Update snippet"""
         ...
 
-    @delete("/snippets", response_class=DeleteSnippetResponseDto)
+    @delete("/snippets", response_class=None)
     async def delete_snippet_by_name(
         self,
         body: Annotated[DeleteSnippetRequestDto, PydanticBody()],

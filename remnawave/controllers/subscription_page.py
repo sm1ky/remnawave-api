@@ -48,7 +48,7 @@ class SubscriptionPageConfigController(BaseController):
         """Get subscription page config by uuid"""
         ...
 
-    @delete("/subscription-page-configs/{uuid}", response_class=DeleteSubscriptionPageConfigResponseDto)
+    @delete("/subscription-page-configs/{uuid}", response_class=None)
     async def delete_config(
         self,
         uuid: Annotated[str, Path(description="Subscription page config UUID")],

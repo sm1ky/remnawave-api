@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from typing import List
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field, RootModel
@@ -320,3 +320,23 @@ class GetStatsUserUsageResponseDto(RootModel[StatsUserUsageData]):
     @property
     def response(self) -> StatsUserUsageData:
         return self.root
+
+
+# ===== v3.0.0 usage endpoints =====
+class FetchNodesUsageBodyDto(BaseModel):
+    nodes_uuids: List[UUID] = Field(serialization_alias="nodesUuids", min_length=1)
+
+
+class FetchNodesUsageResponseDto(BaseModel):
+    nodes: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+class GetInternalSquadUsageResponseDto(BaseModel):
+    squad_uuid: UUID = Field(alias="squadUuid")
+    users: List[Dict[str, Any]] = Field(default_factory=list)
+    next_cursor: Optional[int] = Field(None, alias="nextCursor")
+    has_more: bool = Field(False, alias="hasMore")
+
+
+class GetInternalSquadUserUsageResponseDto(BaseModel):
+    days: List[Dict[str, Any]] = Field(default_factory=list)

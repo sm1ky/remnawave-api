@@ -183,7 +183,7 @@ from .internal_squads import (
     UpdateInternalSquadResponseDto,
     GetInternalSquadAccessibleNodesResponseDto,
 )
-from .keygen import GetPubKeyResponseDto, PubKeyResponseDto  # Legacy alias
+from .keygen import GetNodeSecretKeyResponseDto
 from .nodes import (
     CreateNodeRequestDto,
     CreateNodeResponseDto,
@@ -271,6 +271,8 @@ from .subscriptions_template import (
     UpdateTemplateResponseDto,
 )
 from .system import (
+    GetStatsDigestResponseDto,
+    GetHttpStatsResponseDto,
     BandwidthStatistic,
     BandwidthStatisticResponseDto,
     CPUStatistic,
@@ -296,47 +298,25 @@ from .system import (
     RecapTotal,
 )
 from .users import (
-    # Request DTOs
-    CreateUserRequestDto,
-    UpdateUserRequestDto,
-    RevokeUserRequestDto,
-    ResolveUserRequestBodyDto,
+    # Request body DTOs (v3.0.0)
+    CreateUserBodyDto,
+    UpdateUserBodyDto,
+    ExtendUserBodyDto,
+    RevokeUserSubscriptionBodyDto,
+    ResolveUserBodyDto,
     ResolveUserResponseDto,
-    
-    # Response DTOs - Single User
-    CreateUserResponseDto,
-    UpdateUserResponseDto,
-    GetUserByUuidResponseDto,
-    GetUserByShortUuidResponseDto,
-    GetUserByUsernameResponseDto,
-    GetUserByIdResponseDto,
-    DisableUserResponseDto,
-    EnableUserResponseDto,
-    ResetUserTrafficResponseDto,
-    RevokeUserSubscriptionResponseDto,
-    ActivateAllInboundsResponseDto,
-    
-    # Response DTOs - Collections
-    GetAllUsersResponseDto,
-    GetAllTagsResponseDto,
-    GetUserSubscriptionRequestHistoryResponseDto,
-    GetUsersStreamResponseDto,
-    UsersStreamData,
-    
-    # Response DTOs - Arrays (RootModel)
-    TelegramUserResponseDto,
-    EmailUserResponseDto,
-    TagUserResponseDto,
-    
-    # Other Response DTOs
-    DeleteUserResponseDto,
-    
-    # Base DTOs
+
+    # Response DTOs
     UserResponseDto,
     UsersResponseDto,
+    GetUsersResponseDto,
+    GetUsersStreamResponseDto,
+    UsersStreamData,
+    GetUsersTagsResponseDto,
     TagsResponseDto,
+    GetUserSubscriptionRequestHistoryResponseDto,
     SubscriptionRequestsResponseData,
-    
+
     # Data DTOs
     UserTrafficDto,
     ActiveInternalSquadDto,
@@ -344,9 +324,6 @@ from .users import (
     HappCrypto,
     UserActiveInboundsDto,
     UserLastConnectedNodeDto,
-
-    # Alias
-    GetSubscriptionRequestsResponseDto,
 )
 
 from .users_bulk_actions import (
@@ -636,8 +613,7 @@ __all__ = [
     "GetInternalSquadAccessibleNodesResponseDto",
     "InboundsByProfileData",
     # Keygen models
-    "GetPubKeyResponseDto",
-    "PubKeyResponseDto",  # Legacy alias
+    "GetNodeSecretKeyResponseDto",  # Legacy alias
     # Subscription models
     "GetAllSubscriptionsResponseDto",
     "GetSubscriptionByUsernameResponseDto",
@@ -687,6 +663,8 @@ __all__ = [
     "GetNodesStatisticsResponseDto",
     "GetRemnawaveHealthResponseDto",
     "GetStatsResponseDto",
+    "GetStatsDigestResponseDto",
+    "GetHttpStatsResponseDto",
     "MemoryStatistic",
     "NodeStatistic",
     "NodesStatisticResponseDto",
@@ -773,34 +751,20 @@ __all__ = [
     "UpdateManyHostsRequestDto",
     "UpdateManyHostsResponseDto",
     # Users models
-    "CreateUserRequestDto",
-    "UpdateUserRequestDto",
-    "RevokeUserRequestDto",
-    "ResolveUserRequestBodyDto",
+    "CreateUserBodyDto",
+    "UpdateUserBodyDto",
+    "ExtendUserBodyDto",
+    "RevokeUserSubscriptionBodyDto",
+    "ResolveUserBodyDto",
     "ResolveUserResponseDto",
-    "CreateUserResponseDto",
-    "UpdateUserResponseDto",
-    "GetUserByUuidResponseDto",
-    "GetUserByShortUuidResponseDto",
-    "GetUserByUsernameResponseDto",
-    "GetUserByIdResponseDto",
-    "DisableUserResponseDto",
-    "EnableUserResponseDto",
-    "ResetUserTrafficResponseDto",
-    "RevokeUserSubscriptionResponseDto",
-    "ActivateAllInboundsResponseDto",
-    "GetAllUsersResponseDto",
-    "GetAllTagsResponseDto",
-    "GetUserSubscriptionRequestHistoryResponseDto",
-    "GetUsersStreamResponseDto",
-    "UsersStreamData",
-    "TelegramUserResponseDto",
-    "EmailUserResponseDto",
-    "TagUserResponseDto",
-    "DeleteUserResponseDto",
     "UserResponseDto",
     "UsersResponseDto",
+    "GetUsersResponseDto",
+    "GetUsersStreamResponseDto",
+    "UsersStreamData",
+    "GetUsersTagsResponseDto",
     "TagsResponseDto",
+    "GetUserSubscriptionRequestHistoryResponseDto",
     "SubscriptionRequestsResponseData",
     "UserTrafficDto",
     "ActiveInternalSquadDto",
@@ -808,7 +772,6 @@ __all__ = [
     "HappCrypto",
     "UserActiveInboundsDto",
     "UserLastConnectedNodeDto",
-    "GetSubscriptionRequestsResponseDto",
     # Users bulk actions models
     "BulkAllExtendExpirationDateRequestDto",
     "BulkAllExtendExpirationDateResponseDto",

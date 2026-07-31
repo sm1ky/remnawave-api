@@ -120,14 +120,14 @@ class Scope(StrEnum):
     BANDWIDTH_STATS_NODES_USAGE = "bandwidth-stats:nodes-usage"
 
     # Ip Control
-    IP_CONTROL_ALL = "ip-control:*"
-    IP_CONTROL_READ = "ip-control:read"
-    IP_CONTROL_WRITE = "ip-control:write"
-    IP_CONTROL_FETCH_IPS = "ip-control:fetch-ips"
-    IP_CONTROL_FETCH_IPS_RESULT = "ip-control:fetch-ips-result"
-    IP_CONTROL_DROP_CONNECTIONS = "ip-control:drop-connections"
-    IP_CONTROL_FETCH_USERS_IPS = "ip-control:fetch-users-ips"
-    IP_CONTROL_FETCH_USERS_IPS_RESULT = "ip-control:fetch-users-ips-result"
+    CONNECTIONS_ALL = "connections:*"
+    CONNECTIONS_READ = "connections:read"
+    CONNECTIONS_WRITE = "connections:write"
+    CONNECTIONS_BY_USER = "connections:by-user"
+    CONNECTIONS_BY_USER_RESULT = "connections:by-user-result"
+    CONNECTIONS_DROP = "connections:drop"
+    CONNECTIONS_BY_NODE = "connections:by-node"
+    CONNECTIONS_BY_NODE_RESULT = "connections:by-node-result"
 
     # Config Profiles
     CONFIG_PROFILES_ALL = "config-profiles:*"

@@ -14,7 +14,7 @@ from remnawave.rapid import AttributeBody, BaseController, patch, post
 
 
 class HostsBulkActionsController(BaseController):
-    @post("/hosts/bulk/delete", response_class=BulkDeleteHostsResponseDto)
+    @post("/hosts/bulk/delete", response_class=None)
     async def delete_hosts(
         self,
         uuids: Annotated[List[UUID], AttributeBody()],
@@ -22,7 +22,7 @@ class HostsBulkActionsController(BaseController):
         """Delete many hosts"""
         ...
 
-    @post("/hosts/bulk/disable", response_class=BulkDisableHostsResponseDto)
+    @post("/hosts/bulk/disable", response_class=None)
     async def disable_hosts(
         self,
         uuids: Annotated[List[UUID], AttributeBody()],
@@ -30,7 +30,7 @@ class HostsBulkActionsController(BaseController):
         """Disable many hosts"""
         ...
 
-    @post("/hosts/bulk/enable", response_class=BulkEnableHostsResponseDto)
+    @post("/hosts/bulk/enable", response_class=None)
     async def enable_hosts(
         self,
         uuids: Annotated[List[UUID], AttributeBody()],
@@ -38,7 +38,7 @@ class HostsBulkActionsController(BaseController):
         """Enable many hosts"""
         ...
 
-    @patch("/hosts/bulk/update", response_class=UpdateManyHostsResponseDto)
+    @patch("/hosts/bulk/update", response_class=None)
     async def update_hosts(
         self,
         body: Annotated[UpdateManyHostsRequestDto, PydanticBody()],

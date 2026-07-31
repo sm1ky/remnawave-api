@@ -47,12 +47,12 @@ class SubscriptionsController(BaseController):
         """None"""
         ...
         
-    @get("/subscriptions/by-uuid/{uuid}", response_class=GetSubscriptionByUUIDResponseDto)
-    async def get_subscription_by_uuid(
+    @get("/subscriptions/by-id/{userId}", response_class=GetSubscriptionByUUIDResponseDto)
+    async def get_subscription_by_id(
         self,
-        uuid: Annotated[str, Path(description="UUID of the user")],
+        user_id: Annotated[int, Path(description="Numeric id of the user", alias="userId")],
     ) -> GetSubscriptionByUUIDResponseDto:
-        """None"""
+        """Get subscription by numeric user id"""
         ...
 
     @get("/subscriptions/subpage-config/{shortUuid}", response_class=GetSubpageConfigByShortUuidResponseDto)
@@ -68,15 +68,15 @@ class SubscriptionsController(BaseController):
     async def get_raw_subscription(
         self,
         short_uuid: Annotated[str, Path(description="Short UUID of the user", alias="shortUuid")],
-        with_disabled_hosts: Annotated[bool, Query(default=False, alias="withDisabledHosts", description="Include disabled hosts")] = False,
+        with_disabled_hosts: Annotated[str, Query(default="false", alias="withDisabledHosts", description="Include disabled hosts")] = "false",
     ) -> GetRawSubscriptionByShortUuidResponseDto:
         """None"""
         ...
 
-    @get("/subscriptions/connection-keys/{uuid}", response_class=GetConnectionKeysByUuidResponseDto)
-    async def get_connection_keys_by_uuid(
+    @get("/subscriptions/connection-keys/{userId}", response_class=GetConnectionKeysByUuidResponseDto)
+    async def get_connection_keys_by_user_id(
         self,
-        uuid: Annotated[str, Path(description="UUID of the user")],
+        user_id: Annotated[int, Path(description="Numeric id of the user", alias="userId")],
     ) -> GetConnectionKeysByUuidResponseDto:
         """Get connection keys (base64 format) by uuid"""
         ...

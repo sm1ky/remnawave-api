@@ -63,7 +63,7 @@ class NodesController(BaseController):
         """Get One Node"""
         ...
 
-    @delete("/nodes/{uuid}", response_class=DeleteNodeResponseDto)
+    @delete("/nodes/{uuid}", response_class=None)
     async def delete_node(
         self,
         uuid: Annotated[str, Path(description="Node UUID")],
@@ -95,7 +95,7 @@ class NodesController(BaseController):
         """Disable Node"""
         ...
 
-    @post("/nodes/{uuid}/actions/restart", response_class=RestartNodeResponseDto)
+    @post("/nodes/{uuid}/actions/restart", response_class=None)
     async def restart_node(
         self,
         uuid: Annotated[str, Path(description="Node UUID")],
@@ -104,7 +104,7 @@ class NodesController(BaseController):
         """Restart Node"""
         ...
 
-    @post("/nodes/actions/restart-all", response_class=RestartAllNodesResponseDto)
+    @post("/nodes/actions/restart-all", response_class=None)
     async def restart_all_nodes(
         self,
         body: Annotated[RestartAllNodesRequestBodyDto, PydanticBody()],
@@ -120,7 +120,7 @@ class NodesController(BaseController):
         """Reorder Nodes"""
         ...
     
-    @post("/nodes/{uuid}/actions/reset-traffic", response_class=ResetNodeTrafficResponseDto)
+    @post("/nodes/{uuid}/actions/reset-traffic", response_class=None)
     async def reset_node_traffic(
         self,
         uuid: Annotated[str, Path(description="UUID of the node")],
@@ -128,15 +128,8 @@ class NodesController(BaseController):
         """Reset traffic for individual node"""
         ...
         
-    @post("/nodes/actions/reset-traffic", response_class=ResetNodeTrafficResponseDto)
-    async def reset_traffic_all_nodes(
-        self,
-        body: Annotated[ResetNodeTrafficRequestDto, PydanticBody()],
-    ) -> ResetNodeTrafficResponseDto:
-        """Reset Traffic All Nodes"""
-        ...
         
-    @post("/nodes/bulk-actions/profile-modification", response_class=ProfileModificationResponseDto)
+    @post("/nodes/bulk-actions/profile-modification", response_class=None)
     async def profile_modification(
         self,
         body: Annotated[ProfileModificationRequestDto, PydanticBody()],
@@ -144,7 +137,7 @@ class NodesController(BaseController):
         """Modify Inbounds & Profile for many nodes"""
         ...
 
-    @post("/nodes/bulk-actions", response_class=NodesBulkActionsResponseDto)
+    @post("/nodes/bulk-actions", response_class=None)
     async def nodes_bulk_actions(
         self,
         body: Annotated[NodesBulkActionsRequestDto, PydanticBody()],
@@ -152,7 +145,7 @@ class NodesController(BaseController):
         """Perform actions for many nodes (ENABLE, DISABLE, RESTART, RESET_TRAFFIC)"""
         ...
 
-    @post("/nodes/bulk-actions/update", response_class=BulkNodesUpdateResponseDto)
+    @post("/nodes/bulk-actions/update", response_class=None)
     async def bulk_nodes_update(
         self,
         body: Annotated[BulkNodesUpdateRequestDto, PydanticBody()],

@@ -55,7 +55,7 @@ class InfraBillingController(BaseController):
         """Get infra provider by uuid"""
         ...
 
-    @delete("/infra-billing/providers/{uuid}", response_class=DeleteInfraProviderByUuidResponseDto)
+    @delete("/infra-billing/providers/{uuid}", response_class=None)
     async def delete_infra_provider_by_uuid(
         self,
         uuid: Annotated[str, Path(description="UUID of the infra provider")],
@@ -76,7 +76,7 @@ class InfraBillingController(BaseController):
         """Get infra billing history"""
         ...
 
-    @delete("/infra-billing/history/{uuid}", response_class=DeleteInfraBillingHistoryRecordByUuidResponseDto)
+    @delete("/infra-billing/history/{uuid}", response_class=None)
     async def delete_infra_billing_history_record_by_uuid(
         self,
         uuid: Annotated[str, Path(description="UUID of the billing history record")],
@@ -105,7 +105,7 @@ class InfraBillingController(BaseController):
         """Create infra billing node"""
         ...
 
-    @delete("/infra-billing/nodes/{uuid}", response_class=DeleteInfraBillingNodeByUuidResponseDto)
+    @delete("/infra-billing/nodes/{uuid}", response_class=None)
     async def delete_infra_billing_node_by_uuid(
         self,
         uuid: Annotated[str, Path(description="UUID of the infra billing node")],

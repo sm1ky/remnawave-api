@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -269,3 +269,15 @@ class MetadataResponse(BaseModel):
 class GetMetadataResponseDto(MetadataResponse):
     """Get metadata response"""
     pass
+
+
+# ===== v3.0.0 new system stats =====
+class GetStatsDigestResponseDto(BaseModel):
+    users: Dict[str, Any]
+    traffic: Dict[str, Any]
+    hwid_devices: Dict[str, Any] = Field(alias="hwidDevices")
+
+
+class GetHttpStatsResponseDto(BaseModel):
+    routes: List[Dict[str, Any]] = Field(default_factory=list)
+    total: float = 0

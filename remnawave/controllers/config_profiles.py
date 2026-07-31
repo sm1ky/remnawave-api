@@ -62,7 +62,7 @@ class ConfigProfilesController(BaseController):
         """Get config profile by uuid"""
         ...
 
-    @delete("/config-profiles/{uuid}", response_class=DeleteConfigProfileResponseDto)
+    @delete("/config-profiles/{uuid}", response_class=None)
     async def delete_config_profile_by_uuid(
         self,
         uuid: Annotated[str, Path(description="UUID of the config profile")],

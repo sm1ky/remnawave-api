@@ -64,13 +64,13 @@ class FetchIpsResultResponseDto(FetchIpsResultData):
 # ─────────────────────────────────────────────────────────────────────────────
 
 class DropByUserUuids(BaseModel):
-    """Drop connections for specific user UUIDs"""
-    by: Literal["userUuids"] = "userUuids"
-    user_uuids: List[UUID] = Field(
+    """Drop connections for specific user ids (Remnawave API v3.0.0)."""
+    by: Literal["userIds"] = "userIds"
+    user_ids: List[int] = Field(
         ...,
-        serialization_alias="userUuids",
+        serialization_alias="userIds",
         min_length=1,
-        description="List of user UUIDs whose connections should be dropped",
+        description="List of user ids whose connections should be dropped",
     )
 
 

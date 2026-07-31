@@ -38,7 +38,7 @@ class PasskeysController(BaseController):
         """Get all passkeys"""
         ...
 
-    @delete("/passkeys", response_class=DeletePasskeyResponseDto)
+    @delete("/passkeys", response_class=None)
     async def delete_passkey(
         self,
         body: Annotated[DeletePasskeyRequestDto, PydanticBody()],

@@ -47,7 +47,7 @@ class SubscriptionsTemplateController(BaseController):
         """Get subscription template by uuid"""
         ...
 
-    @delete("/subscription-templates/{uuid}", response_class=DeleteSubscriptionTemplateResponseDto)
+    @delete("/subscription-templates/{uuid}", response_class=None)
     async def delete_template(
         self,
         uuid: Annotated[str, Path(description="Template UUID")],

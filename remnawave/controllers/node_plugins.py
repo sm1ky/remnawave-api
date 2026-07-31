@@ -41,7 +41,7 @@ class NodePluginsController(BaseController):
         """Get Torrent Blocker Reports Stats"""
         ...
 
-    @delete("/node-plugins/torrent-blocker/truncate", response_class=TruncateTorrentBlockerReportsResponseDto)
+    @delete("/node-plugins/torrent-blocker/truncate", response_class=None)
     async def truncate_torrent_blocker_reports(
         self,
     ) -> TruncateTorrentBlockerReportsResponseDto:
@@ -77,7 +77,7 @@ class NodePluginsController(BaseController):
         """Get Node Plugin by uuid"""
         ...
 
-    @delete("/node-plugins/{uuid}", response_class=DeleteNodePluginResponseDto)
+    @delete("/node-plugins/{uuid}", response_class=None)
     async def delete_node_plugin(
         self,
         uuid: Annotated[str, Path(description="Node plugin UUID")],
@@ -101,7 +101,7 @@ class NodePluginsController(BaseController):
         """Clone Node Plugin"""
         ...
 
-    @post("/node-plugins/executor", response_class=PluginExecutorResponseDto)
+    @post("/node-plugins/executor", response_class=None)
     async def plugin_executor(
         self,
         body: Annotated[PluginExecutorRequestDto, PydanticBody()],

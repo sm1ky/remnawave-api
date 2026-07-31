@@ -80,6 +80,12 @@ class BaseController(RapidApi):
                 ),
             )
 
+        # No-body responses (204 No Content, 202 Accepted). In Remnawave API
+        # v3.0.0 many endpoints (DELETE, background/sync ops) return no body —
+        # success is signalled by the status code, so there is nothing to parse.
+        if response_class is None:
+            return None
+
         if response_class is str:
             return response.text
         if response_class is bytes:
@@ -91,6 +97,8 @@ class BaseController(RapidApi):
         ):
             return response_class.from_xml(response.content)
         if issubclass(response_class, BaseModel):
+            if response.status_code == 204 or not response.content:
+                return None
             data = response.json()
             
             # Check if this is a RootModel (list response)

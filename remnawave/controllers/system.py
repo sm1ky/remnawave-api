@@ -1,6 +1,8 @@
 from typing import Annotated
-from rapid_api_client import PydanticBody
+from rapid_api_client import PydanticBody, Query
 from remnawave.models import (
+    GetStatsDigestResponseDto,
+    GetHttpStatsResponseDto,
     GetBandwidthStatsResponseDto,
     GetNodesStatisticsResponseDto,
     GetStatsResponseDto,
@@ -78,4 +80,20 @@ class SystemController(BaseController):
         self,
     ) -> GetRecapResponseDto:
         """Get Recap"""
+        ...
+
+    @get("/system/stats/digest", response_class=GetStatsDigestResponseDto)
+    async def get_stats_digest(
+        self,
+        start: Annotated[str, Query(description="Range start (datetime)")],
+        end: Annotated[str, Query(description="Range end (datetime)")],
+    ) -> GetStatsDigestResponseDto:
+        """Aggregated statistics for a datetime range"""
+        ...
+
+    @get("/system/stats/http", response_class=GetHttpStatsResponseDto)
+    async def get_http_stats(
+        self,
+    ) -> GetHttpStatsResponseDto:
+        """HTTP request counters per route"""
         ...

@@ -69,7 +69,6 @@ class DocsInfoDto(BaseModel):
 
 class FindAllApiTokensResponseData(BaseModel):
     tokens: List[ApiTokenDto] = Field(..., alias="tokens")
-    docs: DocsInfoDto
 
     @property
     def api_keys(self) -> List[ApiTokenDto]:

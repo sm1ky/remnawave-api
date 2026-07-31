@@ -114,3 +114,12 @@ class ReorderInternalSquadsRequestDto(BaseModel):
 
 class ReorderInternalSquadsResponseDto(GetAllInternalSquadsResponse):
     pass
+
+
+# ===== v3.0.0 targeted bulk membership =====
+class AddManyUsersToInternalSquadBodyDto(BaseModel):
+    user_ids: List[int] = Field(serialization_alias="userIds", min_length=1, max_length=1000)
+
+
+class DeleteManyUsersFromInternalSquadBodyDto(BaseModel):
+    user_ids: List[int] = Field(serialization_alias="userIds", min_length=1, max_length=1000)

@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 class CreateUserHwidDeviceRequestDto(BaseModel):
     hwid: str
-    user_uuid: UUID = Field(serialization_alias="userUuid")
+    user_id: int = Field(serialization_alias="userId")
     platform: Optional[str] = None
     os_version: Optional[str] = Field(None, serialization_alias="osVersion")
     device_model: Optional[str] = Field(None, serialization_alias="deviceModel")
@@ -16,7 +16,7 @@ class CreateUserHwidDeviceRequestDto(BaseModel):
 
 
 class DeleteUserHwidDeviceRequestDto(BaseModel):
-    user_uuid: UUID = Field(serialization_alias="userUuid")
+    user_id: int = Field(serialization_alias="userId")
     hwid: str
 
 
@@ -77,11 +77,10 @@ class GetHwidStatisticsResponseDto(HwidStatisticsData):
     pass
 
 class DeleteUserAllHwidDeviceRequestDto(BaseModel):
-    user_uuid: UUID = Field(serialization_alias="userUuid")
+    user_id: int = Field(serialization_alias="userId")
     
 class TopUserByHwidDevicesDto(BaseModel):
     """Top user by HWID devices"""
-    user_uuid: UUID = Field(alias="userUuid")
     id: int
     username: str
     devices_count: float = Field(alias="devicesCount")

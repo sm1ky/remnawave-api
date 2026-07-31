@@ -1,74 +1,40 @@
-from typing import Annotated
+from typing import Annotated, Optional
 
 from rapid_api_client import Path, Query
 from rapid_api_client.annotations import PydanticBody
 
 from remnawave.models.bandwidthstats import (
-    GetLegacyStatsNodesUsersUsageResponseDto,
-    GetLegacyStatsUserUsageResponseDto,
-    GetNodeUserUsageByRangeResponseDto,
-    GetNodesRealtimeUsageResponseDto,
-    GetNodesUsageByRangeResponseDto,
-    GetStatsNodesRealtimeUsageResponseDto,
+    FetchNodesUsageBodyDto,
+    FetchNodesUsageResponseDto,
+    GetInternalSquadUsageResponseDto,
+    GetInternalSquadUserUsageResponseDto,
     GetStatsNodesUsageResponseDto,
     GetStatsNodeUsersUsageResponseDto,
     GetStatsNodesUsersUsageRequestDto,
     GetStatsNodesUsersUsageResponseDto,
     GetStatsUserUsageResponseDto,
-    GetUserUsageByRangeResponseDto,
 )
 from remnawave.rapid import BaseController, get, post
 
 
 class BandWidthStatsController(BaseController):
-    # ============ Legacy Endpoints (Deprecated) ============
-
-    @get("/bandwidth-stats/users/{userUuid}/legacy", response_class=GetUserUsageByRangeResponseDto)
-    async def get_user_usage_legacy_old(
+    @get("/bandwidth-stats/nodes", response_class=GetStatsNodesUsageResponseDto)
+    async def get_stats_nodes_usage(
         self,
-        user_uuid: Annotated[str, Path(description="UUID of the user", alias="userUuid")],
         start: Annotated[str, Query(description="Start date")],
         end: Annotated[str, Query(description="End date")],
-    ) -> GetUserUsageByRangeResponseDto:
-        """Get User Usage by Range (Legacy - Deprecated)"""
-        ...
-
-    @get("/bandwidth-stats/nodes/{nodeUuid}/users/legacy", response_class=GetNodeUserUsageByRangeResponseDto)
-    async def get_node_user_usage_legacy_old(
-        self,
-        node_uuid: Annotated[str, Path(description="UUID of the node", alias="nodeUuid")],
-        start: Annotated[str, Query(description="Start date")],
-        end: Annotated[str, Query(description="End date")],
-    ) -> GetNodeUserUsageByRangeResponseDto:
-        """Get Node User Usage by Range and Node UUID (Legacy - Deprecated)"""
-        ...
-
-    # ============ New Stats Endpoints ============
-    
-    @get("/bandwidth-stats/nodes/realtime", response_class=GetStatsNodesRealtimeUsageResponseDto)
-    async def get_nodes_realtime_usage(
-        self,
-    ) -> GetStatsNodesRealtimeUsageResponseDto:
-        """Get Nodes Realtime Usage"""
-        ...
-
-    @get("/bandwidth-stats/nodes/{uuid}/users/legacy", response_class=GetLegacyStatsNodesUsersUsageResponseDto)
-    async def get_node_users_usage_legacy_stats(
-        self,
-        uuid: Annotated[str, Path(description="UUID of the node")],
-        start: Annotated[str, Query(description="Start date")],
-        end: Annotated[str, Query(description="End date")],
-    ) -> GetLegacyStatsNodesUsersUsageResponseDto:
-        """Get Node Users Usage by Range and Node UUID (Legacy Stats)"""
+        top_nodes_limit: Annotated[Optional[int], Query(default=None, alias="topNodesLimit", description="Limit of top nodes (default 20)")] = None,
+    ) -> GetStatsNodesUsageResponseDto:
+        """Get Nodes Usage by Range"""
         ...
 
     @get("/bandwidth-stats/nodes/{uuid}/users", response_class=GetStatsNodeUsersUsageResponseDto)
     async def get_stats_node_users_usage(
         self,
         uuid: Annotated[str, Path(description="UUID of the node")],
-        top_users_limit: Annotated[int, Query(description="Limit of top users to return", alias="topUsersLimit")],
         start: Annotated[str, Query(description="Start date")],
         end: Annotated[str, Query(description="End date")],
+        top_users_limit: Annotated[Optional[int], Query(default=None, alias="topUsersLimit", description="Limit of top users (default 100)")] = None,
     ) -> GetStatsNodeUsersUsageResponseDto:
         """Get Node Users Usage by Node UUID"""
         ...
@@ -77,40 +43,56 @@ class BandWidthStatsController(BaseController):
     async def get_stats_nodes_users_usage(
         self,
         body: Annotated[GetStatsNodesUsersUsageRequestDto, PydanticBody()],
-        top_users_limit: Annotated[int, Query(description="Limit of top users to return", alias="topUsersLimit")],
         start: Annotated[str, Query(description="Start date (YYYY-MM-DD)")],
         end: Annotated[str, Query(description="End date (YYYY-MM-DD)")],
+        top_users_limit: Annotated[Optional[int], Query(default=None, alias="topUsersLimit", description="Limit of top users (default 100)")] = None,
     ) -> GetStatsNodesUsersUsageResponseDto:
         """Get Nodes Users Usage by Nodes UUIDs"""
         ...
 
-    @get("/bandwidth-stats/users/{uuid}", response_class=GetStatsUserUsageResponseDto)
-    async def get_stats_user_usage(
+    @post("/bandwidth-stats/nodes/usage", response_class=FetchNodesUsageResponseDto)
+    async def fetch_nodes_usage(
         self,
-        uuid: Annotated[str, Path(description="UUID of the user")],
-        top_nodes_limit: Annotated[int, Query(description="Limit of top nodes to return", alias="topNodesLimit")],
+        body: Annotated[FetchNodesUsageBodyDto, PydanticBody()],
         start: Annotated[str, Query(description="Start date")],
         end: Annotated[str, Query(description="End date")],
+        min_total_bytes: Annotated[Optional[int], Query(default=None, alias="minTotalBytes", description="Minimum total bytes filter")] = None,
+    ) -> FetchNodesUsageResponseDto:
+        """Get users whose total usage on the given nodes over the period is >= minTotalBytes"""
+        ...
+
+    @get("/bandwidth-stats/users/{userId}", response_class=GetStatsUserUsageResponseDto)
+    async def get_stats_user_usage(
+        self,
+        user_id: Annotated[int, Path(alias="userId", description="Numeric id of the user")],
+        start: Annotated[str, Query(description="Start date")],
+        end: Annotated[str, Query(description="End date")],
+        top_nodes_limit: Annotated[Optional[int], Query(default=None, alias="topNodesLimit", description="Limit of top nodes (default 20)")] = None,
     ) -> GetStatsUserUsageResponseDto:
         """Get User Usage by Range"""
         ...
 
-    @get("/bandwidth-stats/nodes", response_class=GetStatsNodesUsageResponseDto)
-    async def get_stats_nodes_usage(
+    @get("/bandwidth-stats/internal-squads/{uuid}/usage", response_class=GetInternalSquadUsageResponseDto)
+    async def get_internal_squad_usage(
         self,
-        top_nodes_limit: Annotated[int, Query(description="Limit of top nodes to return", alias="topNodesLimit")],
-        start: Annotated[str, Query(description="Start date")],
-        end: Annotated[str, Query(description="End date")],
-    ) -> GetStatsNodesUsageResponseDto:
-        """Get Nodes Usage by Range"""
+        uuid: Annotated[str, Path(description="UUID of the internal squad")],
+        limit: Annotated[Optional[int], Query(default=None, description="Page size (default 250)")] = None,
+        cursor: Annotated[Optional[int], Query(default=None, description="Keyset cursor")] = None,
+        min_total_bytes: Annotated[Optional[int], Query(default=None, alias="minTotalBytes", description="Minimum total bytes filter")] = None,
+    ) -> GetInternalSquadUsageResponseDto:
+        """Per-user traffic usage on the internal squad nodes (cursor-paginated)."""
         ...
 
-    @get("/bandwidth-stats/users/{uuid}/legacy", response_class=GetLegacyStatsUserUsageResponseDto)
-    async def get_user_usage_legacy_stats(
+    @get(
+        "/bandwidth-stats/internal-squads/{squadUuid}/users/{userId}/usage",
+        response_class=GetInternalSquadUserUsageResponseDto,
+    )
+    async def get_internal_squad_user_usage(
         self,
-        uuid: Annotated[str, Path(description="UUID of the user")],
+        squad_uuid: Annotated[str, Path(alias="squadUuid", description="UUID of the internal squad")],
+        user_id: Annotated[int, Path(alias="userId", description="Numeric id of the user")],
         start: Annotated[str, Query(description="Start date")],
         end: Annotated[str, Query(description="End date")],
-    ) -> GetLegacyStatsUserUsageResponseDto:
-        """Get User Usage by Range (Legacy Stats)"""
+    ) -> GetInternalSquadUserUsageResponseDto:
+        """Daily (zero-filled) usage of a single user on the internal squad nodes."""
         ...

@@ -49,7 +49,7 @@ class HostsController(BaseController):
         """Get Hosts Tags"""
         ...
 
-    @delete("/hosts/{uuid}", response_class=DeleteHostResponseDto)
+    @delete("/hosts/{uuid}", response_class=None)
     async def delete_host(
         self,
         uuid: Annotated[str, Path(description="UUID of the host")],

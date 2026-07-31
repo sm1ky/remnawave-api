@@ -22,17 +22,17 @@ class BulkDeleteUsersByStatusRequestDto(BaseModel):
 
 class BulkDeleteUsersRequestDto(BaseModel):
     """Request to delete users by UUIDs"""
-    uuids: List[UUID] = Field(min_length=1, max_length=500)
+    user_ids: List[int] = Field(min_length=1, max_length=1000, serialization_alias="userIds")
 
 
 class BulkRevokeUsersSubscriptionRequestDto(BaseModel):
     """Request to revoke users subscription"""
-    uuids: List[UUID] = Field(min_length=1, max_length=500)
+    user_ids: List[int] = Field(min_length=1, max_length=1000, serialization_alias="userIds")
 
 
 class BulkResetTrafficUsersRequestDto(BaseModel):
     """Request to reset traffic for users"""
-    uuids: List[UUID] = Field(min_length=1, max_length=500)
+    user_ids: List[int] = Field(min_length=1, max_length=1000, serialization_alias="userIds")
 
 
 class UpdateUserFields(BaseModel):
@@ -75,19 +75,19 @@ class UpdateUserFields(BaseModel):
 
 class BulkUpdateUsersRequestDto(BaseModel):
     """Request to bulk update users"""
-    uuids: List[UUID] = Field(min_length=1, max_length=500)
+    user_ids: List[int] = Field(min_length=1, max_length=1000, serialization_alias="userIds")
     fields: UpdateUserFields
 
 
 class BulkUpdateUsersSquadsRequestDto(BaseModel):
     """Request to update users internal squads"""
-    uuids: List[UUID] = Field(min_length=1, max_length=500)
+    user_ids: List[int] = Field(min_length=1, max_length=1000, serialization_alias="userIds")
     active_internal_squads: List[UUID] = Field(serialization_alias="activeInternalSquads")
 
 
 class BulkExtendExpirationDateRequestDto(BaseModel):
     """Request to extend expiration date for selected users"""
-    uuids: List[UUID] = Field(min_length=1, max_length=500)
+    user_ids: List[int] = Field(min_length=1, max_length=1000, serialization_alias="userIds")
     extend_days: int = Field(
         serialization_alias="extendDays",
         ge=1,

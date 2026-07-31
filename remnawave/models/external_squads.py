@@ -55,7 +55,8 @@ class ExternalSquadDto(BaseModel):
     templates: List[ExternalSquadTemplateDto]
     subscription_settings: Optional[ExternalSquadSubscriptionSettingsDto] = Field(None, alias="subscriptionSettings")
     host_overrides: Optional[ExternalSquadHostOverridesDto] = Field(None, alias="hostOverrides")
-    response_headers: Optional[Dict[str, str]] = Field(None, alias="responseHeaders")
+    response_headers_add: Optional[Dict[str, str]] = Field(None, alias="responseHeadersAdd")
+    response_headers_remove: Optional[List[str]] = Field(None, alias="responseHeadersRemove")
     hwid_settings: Optional[HwidSettingsDto] = Field(None, alias="hwidSettings")
     custom_remarks: Optional[CustomRemarksDto] = Field(None, alias="customRemarks")
     subpage_config_uuid: Optional[UUID] = Field(None, alias="subpageConfigUuid")
@@ -94,7 +95,8 @@ class UpdateExternalSquadRequestDto(BaseModel):
     host_overrides: Optional[ExternalSquadHostOverridesDto] = Field(None, serialization_alias="hostOverrides")
     hwid_settings: Optional[HwidSettingsDto] = Field(None, alias="hwidSettings")
     custom_remarks: Optional[CustomRemarksDto] = Field(None, alias="customRemarks")
-    response_headers: Optional[Dict[str, str]] = Field(None, serialization_alias="responseHeaders")
+    response_headers_add: Optional[Dict[str, str]] = Field(None, serialization_alias="responseHeadersAdd")
+    response_headers_remove: Optional[List[str]] = Field(None, serialization_alias="responseHeadersRemove")
     subpage_config_uuid: Optional[UUID] = Field(None, serialization_alias="subpageConfigUuid")
 
 

@@ -23,7 +23,7 @@ class APITokensManagementController(BaseController):
         """Create new API token"""
         ...
 
-    @delete("/tokens/{uuid}", response_class=DeleteApiTokenResponseDto)
+    @delete("/tokens/{uuid}", response_class=None)
     async def delete(
         self,
         uuid: Annotated[str, Path(description="UUID of the API token")],

@@ -111,17 +111,11 @@ class HwidSettingsDto(BaseModel):
 class SubscriptionSettingsResponseDto(BaseModel):
     """Subscription settings response data"""
     uuid: UUID
-    profile_title: str = Field(alias="profileTitle")
-    support_link: str = Field(alias="supportLink")
-    profile_update_interval: int = Field(alias="profileUpdateInterval", ge=1)
-    is_profile_webpage_url_enabled: bool = Field(alias="isProfileWebpageUrlEnabled")
     serve_json_at_base_subscription: bool = Field(alias="serveJsonAtBaseSubscription")
     show_custom_remarks: bool = Field(alias="isShowCustomRemarks")
     
     custom_remarks: CustomRemarksDto = Field(alias="customRemarks")
     
-    happ_announce: Optional[str] = Field(None, alias="happAnnounce")
-    happ_routing: Optional[str] = Field(None, alias="happRouting")
     custom_response_headers: Optional[Dict[str, str]] = Field(None, alias="customResponseHeaders")
     randomize_hosts: bool = Field(alias="randomizeHosts")
     response_rules: Optional[ResponseRules] = Field(None, alias="responseRules")
@@ -143,12 +137,6 @@ class UpdateSubscriptionSettingsResponseDto(SubscriptionSettingsResponseDto):
 class UpdateSubscriptionSettingsRequestDto(BaseModel):
     """Update subscription settings request"""
     uuid: UUID
-    profile_title: Optional[str] = Field(None, serialization_alias="profileTitle")
-    support_link: Optional[str] = Field(None, serialization_alias="supportLink")
-    profile_update_interval: Optional[int] = Field(None, serialization_alias="profileUpdateInterval")
-    is_profile_webpage_url_enabled: Optional[bool] = Field(
-        None, serialization_alias="isProfileWebpageUrlEnabled"
-    )
     serve_json_at_base_subscription: Optional[bool] = Field(
         None, serialization_alias="serveJsonAtBaseSubscription"
     )
@@ -156,10 +144,6 @@ class UpdateSubscriptionSettingsRequestDto(BaseModel):
     
     custom_remarks: Optional[CustomRemarksDto] = Field(None, serialization_alias="customRemarks")
     
-    happ_announce: Optional[Annotated[str, StringConstraints(max_length=200)]] = Field(
-        None, serialization_alias="happAnnounce"
-    )
-    happ_routing: Optional[str] = Field(None, serialization_alias="happRouting")
     custom_response_headers: Optional[Dict[str, str]] = Field(
         None, serialization_alias="customResponseHeaders"
     )
