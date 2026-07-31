@@ -3,9 +3,9 @@
 [![Stars](https://img.shields.io/github/stars/sm1ky/remnawave-api.svg?style=social)](https://github.com/sm1ky/remnawave-api/stargazers)
 [![Forks](https://img.shields.io/github/forks/sm1ky/remnawave-api.svg?style=social)](https://github.com/sm1ky/remnawave-api/network/members)
 [![Issues](https://img.shields.io/github/issues/sm1ky/remnawave-api.svg)](https://github.com/sm1ky/remnawave-api/issues)
-[![Supported python versions](https://img.shields.io/pypi/pyversions/remnawave.svg)](https://pypi.python.org/pypi/remnawave)
-[![Downloads](https://img.shields.io/pypi/dm/remnawave.svg)](https://pypi.python.org/pypi/remnawave)
-[![PyPi Package Version](https://img.shields.io/pypi/v/remnawave)](https://pypi.python.org/pypi/remnawave)
+[![Supported python versions](https://img.shields.io/pypi/pyversions/remnawave-api.svg)](https://pypi.python.org/pypi/remnawave-api)
+[![Downloads](https://img.shields.io/pypi/dm/remnawave-api.svg)](https://pypi.python.org/pypi/remnawave-api)
+[![PyPi Package Version](https://img.shields.io/pypi/v/remnawave-api)](https://pypi.python.org/pypi/remnawave-api)
 [![Publish Python Package](https://github.com/sm1ky/remnawave-api/actions/workflows/upload.yml/badge.svg?branch=production)](https://github.com/sm1ky/remnawave-api/actions/workflows/upload.yml)
 
 A Python SDK client for interacting with the **[Remnawave API](https://remna.st)**.
@@ -14,10 +14,10 @@ This library simplifies working with the API by providing convenient controllers
 ## 📦 Installation
 
 ### Package (Recommended)
-Install the latest version from the new PyPI package:
+Install the latest version from PyPI:
 
 ```bash
-pip install remnawave_api
+pip install remnawave-api
 ```
 
 ### Development Version
