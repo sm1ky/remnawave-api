@@ -7,9 +7,9 @@ from pydantic import ValidationError
 
 from remnawave.models import (
     # Users
-    ResolveUserRequestBodyDto,
+    ResolveUserBodyDto,
     ResolveUserResponseDto,
-    RevokeUserRequestDto,
+    RevokeUserSubscriptionBodyDto,
     # System
     GetRecapResponseDto,
     RecapThisMonth,
@@ -40,43 +40,32 @@ from remnawave.models import (
 from remnawave.enums import ResponseRuleVersion
 
 
-class TestResolveUserRequestBodyDto:
-    def test_create_with_uuid(self):
-        uid = uuid4()
-        dto = ResolveUserRequestBodyDto(uuid=uid)
-        assert dto.uuid == uid
-        assert dto.id is None
-        assert dto.username is None
-
+class TestResolveUserBodyDto:
     def test_create_with_username(self):
-        dto = ResolveUserRequestBodyDto(username="testuser")
+        dto = ResolveUserBodyDto(username="testuser")
         assert dto.username == "testuser"
-        assert dto.uuid is None
 
     def test_create_with_short_uuid(self):
-        dto = ResolveUserRequestBodyDto(short_uuid="abc123")
+        dto = ResolveUserBodyDto(short_uuid="abc123")
         assert dto.short_uuid == "abc123"
 
     def test_serialization_alias(self):
-        dto = ResolveUserRequestBodyDto(short_uuid="abc123")
+        dto = ResolveUserBodyDto(short_uuid="abc123")
         data = dto.model_dump(by_alias=True)
         assert "shortUuid" in data
 
     def test_create_with_id(self):
-        dto = ResolveUserRequestBodyDto(id=42)
+        dto = ResolveUserBodyDto(id=42)
         assert dto.id == 42
 
 
 class TestResolveUserResponseDto:
     def test_from_api_response(self):
-        uid = uuid4()
         dto = ResolveUserResponseDto(
-            uuid=uid,
             username="testuser",
             id=1,
             shortUuid="abc123",
         )
-        assert dto.uuid == uid
         assert dto.username == "testuser"
         assert dto.id == 1
         assert dto.short_uuid == "abc123"

@@ -17,7 +17,7 @@ class NodeInfoDto(BaseModel):
     active_squads: List[NodeActiveSquadDto] = Field(alias="activeSquads")
 
 class GetUserAccessibleNodesResponse(BaseModel):
-    user_uuid: UUID = Field(alias="userUuid")
+    user_id: int = Field(alias="userId")
     active_nodes: List[NodeInfoDto] = Field(default_factory=list, alias="activeNodes")
 
     @property
@@ -55,7 +55,7 @@ class GetNodesUsageByRangeResponseDto(RootModel[List[NodeUsageDto]]):
 
 class UserUsageDto(BaseModel):
     """User usage data with node information"""
-    user_uuid: UUID = Field(alias="userUuid")
+    user_id: int = Field(alias="userId")
     node_uuid: UUID = Field(alias="nodeUuid")
     username: str
     total: int

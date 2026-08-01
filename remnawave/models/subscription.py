@@ -33,8 +33,7 @@ class UserTrafficDto(BaseModel):
 
 
 class UserResponseDto(BaseModel):
-    uuid: UUID
-    id: Optional[int] = None
+    id: int
     short_uuid: str = Field(alias="shortUuid")
     username: str
     status: UserStatus = Field(default=UserStatus.ACTIVE)

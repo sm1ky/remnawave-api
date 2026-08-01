@@ -57,7 +57,7 @@ async def test_nodes(remnawave):
     assert isinstance(reorder_node, ReorderNodeResponseDto)
     # assert any(node.uuid == create_node.uuid for node in reorder_node.root)
 
-    update_name: str = "TEST_NAME"
+    update_name: str = generate_random_string()
     update_node = await remnawave.nodes.update_node(
         UpdateNodeRequestDto(uuid=string_uuid, name=update_name)
     )
@@ -66,9 +66,7 @@ async def test_nodes(remnawave):
     assert update_node.name == update_name
 
     reset_traffic = await remnawave.nodes.reset_node_traffic(uuid=string_uuid)
-    assert isinstance(reset_traffic, ResetNodeTrafficResponseDto)
-    assert reset_traffic.event_sent is True
+    assert reset_traffic is None
 
     delete_node = await remnawave.nodes.delete_node(uuid=string_uuid)
-    assert isinstance(delete_node, DeleteNodeResponseDto)
-    assert delete_node.is_deleted is True
+    assert delete_node is None

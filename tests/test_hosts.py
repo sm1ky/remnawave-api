@@ -157,8 +157,7 @@ class TestHostsCRUD:
         
         # Теперь удаляем созданный хост
         delete_host = await remnawave.hosts.delete_host(uuid=string_uuid)
-        assert isinstance(delete_host, DeleteHostResponseDto)
-        assert delete_host.is_deleted is True
+        assert delete_host is None
         
         # Проверяем, что хост действительно удален
         try:

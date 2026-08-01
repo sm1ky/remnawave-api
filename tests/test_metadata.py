@@ -5,7 +5,7 @@ import pytest
 
 from remnawave.exceptions import NotFoundError
 from remnawave.models import (
-    CreateUserRequestDto,
+    CreateUserBodyDto,
     GetNodeMetadataResponseDto,
     GetUserMetadataResponseDto,
     UpsertNodeMetadataRequestBodyDto,
@@ -29,9 +29,9 @@ class TestUserMetadata:
         username = generate_random_string(length=8)
         expire_at = datetime.now(timezone.utc) + timedelta(days=7)
         create_user = await remnawave.users.create_user(
-            CreateUserRequestDto(username=username, expire_at=expire_at)
+            CreateUserBodyDto(username=username, expire_at=expire_at)
         )
-        user_uuid = str(create_user.uuid)
+        user_id = create_user.id
         
         try:
             # Upsert metadata
@@ -44,14 +44,14 @@ class TestUserMetadata:
             }
             
             upsert_response = await remnawave.metadata.upsert_user_metadata(
-                uuid=user_uuid,
+                user_id=user_id,
                 body=UpsertUserMetadataRequestBodyDto(metadata=test_metadata)
             )
             
             assert isinstance(upsert_response, UpsertUserMetadataResponseDto)
             
             # Get metadata
-            get_response = await remnawave.metadata.get_user_metadata(uuid=user_uuid)
+            get_response = await remnawave.metadata.get_user_metadata(user_id=user_id)
             
             assert isinstance(get_response, GetUserMetadataResponseDto)
             assert hasattr(get_response, "metadata")
@@ -62,7 +62,7 @@ class TestUserMetadata:
             
         finally:
             # Cleanup
-            await remnawave.users.delete_user(uuid=user_uuid)
+            await remnawave.users.delete_user(user_id=user_id)
 
     @pytest.mark.asyncio
     async def test_update_existing_user_metadata(self, remnawave):
@@ -71,15 +71,15 @@ class TestUserMetadata:
         username = generate_random_string(length=8)
         expire_at = datetime.now(timezone.utc) + timedelta(days=7)
         create_user = await remnawave.users.create_user(
-            CreateUserRequestDto(username=username, expire_at=expire_at)
+            CreateUserBodyDto(username=username, expire_at=expire_at)
         )
-        user_uuid = str(create_user.uuid)
+        user_id = create_user.id
         
         try:
             # Initial metadata
             initial_metadata = {"field1": "value1"}
             await remnawave.metadata.upsert_user_metadata(
-                uuid=user_uuid,
+                user_id=user_id,
                 body=UpsertUserMetadataRequestBodyDto(metadata=initial_metadata)
             )
             
@@ -89,20 +89,20 @@ class TestUserMetadata:
                 "field2": "value2"
             }
             upsert_response = await remnawave.metadata.upsert_user_metadata(
-                uuid=user_uuid,
+                user_id=user_id,
                 body=UpsertUserMetadataRequestBodyDto(metadata=updated_metadata)
             )
             
             assert isinstance(upsert_response, UpsertUserMetadataResponseDto)
             
             # Verify update
-            get_response = await remnawave.metadata.get_user_metadata(uuid=user_uuid)
+            get_response = await remnawave.metadata.get_user_metadata(user_id=user_id)
             assert get_response.metadata.get("field1") == "updated_value1"
             assert get_response.metadata.get("field2") == "value2"
             
         finally:
             # Cleanup
-            await remnawave.users.delete_user(uuid=user_uuid)
+            await remnawave.users.delete_user(user_id=user_id)
 
     @pytest.mark.asyncio
     async def test_get_user_metadata_empty(self, remnawave):
@@ -111,14 +111,14 @@ class TestUserMetadata:
         username = generate_random_string(length=8)
         expire_at = datetime.now(timezone.utc) + timedelta(days=7)
         create_user = await remnawave.users.create_user(
-            CreateUserRequestDto(username=username, expire_at=expire_at)
+            CreateUserBodyDto(username=username, expire_at=expire_at)
         )
-        user_uuid = str(create_user.uuid)
+        user_id = create_user.id
         
         try:
             # Get metadata (API может вернуть пустой объект или 404, если метаданные не созданы)
             try:
-                get_response = await remnawave.metadata.get_user_metadata(uuid=user_uuid)
+                get_response = await remnawave.metadata.get_user_metadata(user_id=user_id)
                 assert isinstance(get_response, GetUserMetadataResponseDto)
                 assert get_response.metadata is None or get_response.metadata == {}
             except NotFoundError:
@@ -127,7 +127,7 @@ class TestUserMetadata:
 
         finally:
             # Cleanup
-            await remnawave.users.delete_user(uuid=user_uuid)
+            await remnawave.users.delete_user(user_id=user_id)
 
 
 class TestNodeMetadata:

@@ -21,7 +21,7 @@ class TestHwidInfo:
     @pytest.mark.asyncio
     async def test_get_hwid_user(self, remnawave):
         """Тест получения HWID устройств конкретного пользователя"""
-        hwid = await remnawave.hwid.get_hwid_user(uuid=REMNAWAVE_USER_UUID)
+        hwid = await remnawave.hwid.get_hwid_user(user_id=1)
         assert isinstance(hwid, GetUserHwidDevicesResponseDto)
         assert hasattr(hwid, "devices")
     
@@ -89,7 +89,7 @@ class TestHwidCRUD:
         # Создаем запрос на добавление HWID
         create_request = CreateUserHwidDeviceRequestDto(
             hwid=test_hwid,
-            user_uuid=REMNAWAVE_USER_UUID,
+            user_id=1,
             platform="Windows",
             os_version="10.0.19042",
             device_model="Surface Pro",
@@ -104,7 +104,7 @@ class TestHwidCRUD:
         assert any(item.hwid == test_hwid for item in response.devices)
         
         # Проверяем, что устройство действительно добавлено
-        hwid_check = await remnawave.hwid.get_hwid_user(uuid=REMNAWAVE_USER_UUID)
+        hwid_check = await remnawave.hwid.get_hwid_user(user_id=1)
         assert any(device.hwid == test_hwid for device in hwid_check.devices)
     
     @pytest.mark.asyncio
@@ -113,7 +113,7 @@ class TestHwidCRUD:
         # Сначала добавляем устройство
         create_request = CreateUserHwidDeviceRequestDto(
             hwid=test_hwid,
-            user_uuid=REMNAWAVE_USER_UUID,
+            user_id=1,
             platform="Android",
             os_version="12",
             device_model="Pixel 6",
@@ -124,7 +124,7 @@ class TestHwidCRUD:
         # Удаляем устройство
         delete_request = DeleteUserHwidDeviceRequestDto(
             hwid=test_hwid,
-            user_uuid=REMNAWAVE_USER_UUID
+            user_id=1
         )
         response = await remnawave.hwid.delete_hwid_to_user(body=delete_request)
         
@@ -133,7 +133,7 @@ class TestHwidCRUD:
         assert not any(item.hwid == test_hwid for item in response.devices)
         
         # Проверяем, что устройство действительно удалено
-        hwid_check = await remnawave.hwid.get_hwid_user(uuid=REMNAWAVE_USER_UUID)
+        hwid_check = await remnawave.hwid.get_hwid_user(user_id=1)
         assert not any(device.hwid == test_hwid for device in hwid_check.devices)
     
     @pytest.mark.asyncio
@@ -143,7 +143,7 @@ class TestHwidCRUD:
         random_hwid = str(uuid.uuid4())
         create_request = CreateUserHwidDeviceRequestDto(
             hwid=random_hwid,
-            user_uuid=REMNAWAVE_USER_UUID,
+            user_id=1,
             platform="iOS",
             os_version="15.0",
             device_model="iPhone 13",
@@ -152,12 +152,12 @@ class TestHwidCRUD:
         await remnawave.hwid.add_hwid_to_users(body=create_request)
         
         # Проверяем, что устройство добавлено
-        check_before = await remnawave.hwid.get_hwid_user(uuid=REMNAWAVE_USER_UUID)
+        check_before = await remnawave.hwid.get_hwid_user(user_id=1)
         assert any(device.hwid == random_hwid for device in check_before.devices)
         
         # Теперь удалим все HWID устройства пользователя
         delete_all_request = DeleteUserAllHwidDeviceRequestDto(
-            user_uuid=REMNAWAVE_USER_UUID
+            user_id=1
         )
         response = await remnawave.hwid.delete_all_hwid_user(body=delete_all_request)
         
@@ -165,5 +165,5 @@ class TestHwidCRUD:
         assert isinstance(response, DeleteUserHwidDeviceResponseDto)
         
         # Проверяем, что устройства действительно удалены
-        hwid_check = await remnawave.hwid.get_hwid_user(uuid=REMNAWAVE_USER_UUID)
+        hwid_check = await remnawave.hwid.get_hwid_user(user_id=1)
         assert not any(device.hwid == random_hwid for device in hwid_check.devices)

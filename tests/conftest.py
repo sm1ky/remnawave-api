@@ -33,7 +33,6 @@ async def remnawave() -> RemnawaveSDK:
     assert sdk.hosts is not None
     assert sdk.hosts_bulk_actions is not None
     assert sdk.inbounds is not None
-    assert sdk.inbounds_bulk_actions is not None
     assert sdk.keygen is not None
     assert sdk.nodes is not None
     assert sdk.subscription is not None
@@ -43,7 +42,7 @@ async def remnawave() -> RemnawaveSDK:
     assert sdk.users is not None
     assert sdk.users_bulk_actions is not None
     assert sdk.subscription_page_config is not None
-    assert sdk.xray_config is not None
+    assert sdk.connections is not None
     assert sdk.hwid is not None
     assert sdk.node_plugins is not None
     assert sdk.metadata is not None

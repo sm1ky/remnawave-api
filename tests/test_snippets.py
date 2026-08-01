@@ -50,7 +50,7 @@ async def test_snippets_full_workflow(remnawave):
     # Test deleting the snippet
     delete_request = DeleteSnippetRequestDto(name=rand_name)
     deleted = await remnawave.snippets.delete_snippet_by_name(delete_request)
-    assert deleted.total == initial_count
+    assert deleted is None
     
     # Verify snippet was deleted
     snippets_after_delete = await remnawave.snippets.get_snippets()

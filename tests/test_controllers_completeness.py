@@ -1,19 +1,18 @@
-"""Tests that all required endpoints exist in controllers."""
+"""Tests that all required endpoints exist in controllers (Remnawave API v3.0.0)."""
 import pytest
-import inspect
 
 from remnawave.controllers.users import UsersController
 from remnawave.controllers.system import SystemController
-from remnawave.controllers.ip_control import IpControlController
+from remnawave.controllers.connections import ConnectionsController
 from remnawave.controllers.api_tokens_management import APITokensManagementController
 from remnawave.controllers.hosts_bulk_actions import HostsBulkActionsController
 from remnawave.controllers.bandwidthstats import BandWidthStatsController
+from remnawave.controllers.internal_squads import InternalSquadsController
 
 
 class TestUsersControllerEndpoints:
     def test_has_resolve_user(self):
         assert hasattr(UsersController, "resolve_user")
-        assert callable(getattr(UsersController, "resolve_user"))
 
     def test_has_revoke_user_subscription(self):
         assert hasattr(UsersController, "revoke_user_subscription")
@@ -39,26 +38,14 @@ class TestUsersControllerEndpoints:
     def test_has_get_all_users(self):
         assert hasattr(UsersController, "get_all_users")
 
-    def test_has_get_user_by_uuid(self):
-        assert hasattr(UsersController, "get_user_by_uuid")
+    def test_has_get_user_by_id(self):
+        assert hasattr(UsersController, "get_user_by_id")
 
     def test_has_get_user_by_short_uuid(self):
         assert hasattr(UsersController, "get_user_by_short_uuid")
 
     def test_has_get_user_by_username(self):
         assert hasattr(UsersController, "get_user_by_username")
-
-    def test_has_get_user_by_id(self):
-        assert hasattr(UsersController, "get_user_by_id")
-
-    def test_has_get_users_by_telegram_id(self):
-        assert hasattr(UsersController, "get_users_by_telegram_id")
-
-    def test_has_get_users_by_email(self):
-        assert hasattr(UsersController, "get_users_by_email")
-
-    def test_has_get_users_by_tag(self):
-        assert hasattr(UsersController, "get_users_by_tag")
 
     def test_has_get_all_tags(self):
         assert hasattr(UsersController, "get_all_tags")
@@ -71,13 +58,22 @@ class TestUsersControllerEndpoints:
 
     def test_has_get_users_stream(self):
         assert hasattr(UsersController, "get_users_stream")
-        assert callable(getattr(UsersController, "get_users_stream"))
+
+    def test_has_extend_user(self):
+        # New in v3.0.0
+        assert hasattr(UsersController, "extend_user")
+
+    def test_no_removed_user_lookups(self):
+        # Removed in v3.0.0 (use /users/stream filters or get_user_by_id)
+        assert not hasattr(UsersController, "get_user_by_uuid")
+        assert not hasattr(UsersController, "get_users_by_telegram_id")
+        assert not hasattr(UsersController, "get_users_by_email")
+        assert not hasattr(UsersController, "get_users_by_tag")
 
 
 class TestSystemControllerEndpoints:
     def test_has_get_recap(self):
         assert hasattr(SystemController, "get_recap")
-        assert callable(getattr(SystemController, "get_recap"))
 
     def test_has_get_metadata(self):
         assert hasattr(SystemController, "get_metadata")
@@ -103,51 +99,67 @@ class TestSystemControllerEndpoints:
     def test_has_debug_srr_matcher(self):
         assert hasattr(SystemController, "debug_srr_matcher")
 
-    def test_no_encrypt_happ_crypto_link(self):
-        # Removed in Remnawave API v2.8.0 (use client-side happ link generation instead)
-        assert not hasattr(SystemController, "encrypt_happ_crypto_link")
+    def test_has_new_stats_digest_http(self):
+        # New in v3.0.0
+        assert hasattr(SystemController, "get_stats_digest")
+        assert hasattr(SystemController, "get_http_stats")
 
 
 class TestApiTokensControllerEndpoints:
     def test_has_get_scopes(self):
         assert hasattr(APITokensManagementController, "get_scopes")
-        assert callable(getattr(APITokensManagementController, "get_scopes"))
 
 
 class TestHostsBulkActionsControllerEndpoints:
     def test_has_update_hosts(self):
         assert hasattr(HostsBulkActionsController, "update_hosts")
-        assert callable(getattr(HostsBulkActionsController, "update_hosts"))
 
     def test_no_set_inbound_to_hosts(self):
-        # Removed in Remnawave API v2.8.0 (replaced by update_hosts)
         assert not hasattr(HostsBulkActionsController, "set_inbound_to_hosts")
 
     def test_no_set_port_to_hosts(self):
-        # Removed in Remnawave API v2.8.0 (replaced by update_hosts)
         assert not hasattr(HostsBulkActionsController, "set_port_to_hosts")
 
 
 class TestBandwidthStatsControllerEndpoints:
     def test_has_get_stats_nodes_users_usage(self):
         assert hasattr(BandWidthStatsController, "get_stats_nodes_users_usage")
-        assert callable(getattr(BandWidthStatsController, "get_stats_nodes_users_usage"))
+
+    def test_has_new_usage_endpoints(self):
+        # New in v3.0.0
+        assert hasattr(BandWidthStatsController, "fetch_nodes_usage")
+        assert hasattr(BandWidthStatsController, "get_internal_squad_usage")
+
+    def test_no_legacy_endpoints(self):
+        # Removed in v3.0.0
+        assert not hasattr(BandWidthStatsController, "get_user_usage_legacy_stats")
+        assert not hasattr(BandWidthStatsController, "get_nodes_realtime_usage")
 
 
-class TestIpControlControllerEndpoints:
-    def test_has_fetch_user_ips(self):
-        assert hasattr(IpControlController, "fetch_user_ips")
+class TestConnectionsControllerEndpoints:
+    """Renamed from ip-control in v3.0.0."""
 
-    def test_has_get_fetch_ips_result(self):
-        assert hasattr(IpControlController, "get_fetch_ips_result")
+    def test_has_fetch_connections_by_user(self):
+        assert hasattr(ConnectionsController, "fetch_connections_by_user")
 
-    def test_has_fetch_users_ips(self):
-        assert hasattr(IpControlController, "fetch_users_ips")
-        assert callable(getattr(IpControlController, "fetch_users_ips"))
+    def test_has_get_connections_by_user(self):
+        assert hasattr(ConnectionsController, "get_connections_by_user")
 
-    def test_has_get_fetch_users_ips_result(self):
-        assert hasattr(IpControlController, "get_fetch_users_ips_result")
-        assert callable(getattr(IpControlController, "get_fetch_users_ips_result"))
+    def test_has_fetch_connections_by_node(self):
+        assert hasattr(ConnectionsController, "fetch_connections_by_node")
+
+    def test_has_get_connections_by_node(self):
+        assert hasattr(ConnectionsController, "get_connections_by_node")
 
     def test_has_drop_connections(self):
-        assert hasattr(IpControlController, "drop_connections")
+        assert hasattr(ConnectionsController, "drop_connections")
+
+
+class TestInternalSquadsControllerEndpoints:
+    def test_has_add_many_users(self):
+        # New in v3.0.0
+        assert hasattr(InternalSquadsController, "add_many_users_to_internal_squad")
+
+    def test_has_remove_many_users(self):
+        # New in v3.0.0
+        assert hasattr(InternalSquadsController, "remove_many_users_from_internal_squad")

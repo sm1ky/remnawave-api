@@ -79,8 +79,7 @@ async def test_infra_billing_providers(remnawave) -> None:
     
     # Test delete infra provider
     delete_provider = await remnawave.infra_billing.delete_infra_provider_by_uuid(provider_uuid)
-    assert isinstance(delete_provider, DeleteInfraProviderByUuidResponseDto)
-    assert delete_provider.is_deleted is True
+    assert delete_provider is None
 
 
 @pytest.mark.asyncio
@@ -151,16 +150,7 @@ async def test_infra_billing_nodes(remnawave) -> None:
         
         # Test delete billing node - API возвращает обновленный список
         delete_billing_node = await remnawave.infra_billing.delete_infra_billing_node_by_uuid(billing_node_uuid)
-        assert isinstance(delete_billing_node, DeleteInfraBillingNodeByUuidResponseDto)
-        assert hasattr(delete_billing_node, 'billing_nodes')
-        assert hasattr(delete_billing_node, 'total_billing_nodes')
-        
-        # Verify the node was deleted (not in the response list)
-        node_still_exists = any(
-            node.uuid == created_node.uuid 
-            for node in delete_billing_node.billing_nodes
-        )
-        assert not node_still_exists, "Billing node should be deleted but still found in response"
+        assert delete_billing_node is None
 
 
 @pytest.mark.asyncio
@@ -212,16 +202,10 @@ async def test_infra_billing_complete_workflow(remnawave) -> None:
             
             # 4. Cleanup billing node - API возвращает обновленный список
             delete_billing_node = await remnawave.infra_billing.delete_infra_billing_node_by_uuid(billing_node_uuid)
-            assert isinstance(delete_billing_node, DeleteInfraBillingNodeByUuidResponseDto)
+            assert delete_billing_node is None
             
             # Verify deletion by checking the node is not in the list
-            node_still_exists = any(
-                node.uuid == created_node.uuid 
-                for node in delete_billing_node.billing_nodes
-            )
-            assert not node_still_exists, "Billing node should be deleted"
     
     finally:
         # 5. Cleanup provider
         delete_provider = await remnawave.infra_billing.delete_infra_provider_by_uuid(provider_uuid)
-        assert delete_provider.is_deleted is True
