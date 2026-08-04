@@ -281,3 +281,33 @@ class GetStatsDigestResponseDto(BaseModel):
 class GetHttpStatsResponseDto(BaseModel):
     routes: List[Dict[str, Any]] = Field(default_factory=list)
     total: float = 0
+
+
+# ===== v3.2.0 configuration =====
+class ConfigurationNotifications(BaseModel):
+    webhook: bool
+    bandwidth_usage: Optional[List[float]] = Field(None, alias="bandwidthUsage")
+    not_connected_after: Optional[List[float]] = Field(None, alias="notConnectedAfter")
+    expiration_notifications: Optional[List[float]] = Field(
+        None, alias="expirationNotifications"
+    )
+
+
+class ConfigurationService(BaseModel):
+    clean_usage_history: bool = Field(alias="cleanUsageHistory")
+    disable_user_usage_records: bool = Field(alias="disableUserUsageRecords")
+    disable_srh_records: bool = Field(alias="disableSrhRecords")
+    export_to_redis_stream: bool = Field(alias="exportToRedisStream")
+
+
+class ConfigurationMisc(BaseModel):
+    short_uuid_length: float = Field(alias="shortUuidLength")
+    sub_public_domain: str = Field(alias="subPublicDomain")
+    user_usage_ignore_below_bytes: float = Field(alias="userUsageIgnoreBelowBytes")
+
+
+class GetConfigurationResponseDto(BaseModel):
+    """Selected Remnawave configuration values (GET /system/configuration)."""
+    notifications: ConfigurationNotifications
+    service: ConfigurationService
+    misc: ConfigurationMisc

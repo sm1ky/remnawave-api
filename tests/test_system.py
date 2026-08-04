@@ -6,6 +6,7 @@ from remnawave.models import (
     GetStatsResponseDto,
     GetNodesMetricsResponseDto,
     GetRemnawaveHealthResponseDto,
+    GetConfigurationResponseDto,
 )
 
 
@@ -64,3 +65,25 @@ class TestSystemMonitoring:
         health = await remnawave.system.get_health()
         assert isinstance(health, GetRemnawaveHealthResponseDto)
         assert hasattr(health, 'pm2_stats')
+
+
+class TestSystemConfiguration:
+    """Тесты для конфигурации системы (API v3.2.0)"""
+
+    @pytest.mark.asyncio
+    async def test_get_configuration(self, remnawave):
+        """Тест получения конфигурации Remnawave"""
+        config = await remnawave.system.get_configuration()
+        assert isinstance(config, GetConfigurationResponseDto)
+
+        # notifications
+        assert isinstance(config.notifications.webhook, bool)
+        # service
+        assert isinstance(config.service.clean_usage_history, bool)
+        assert isinstance(config.service.disable_user_usage_records, bool)
+        assert isinstance(config.service.disable_srh_records, bool)
+        assert isinstance(config.service.export_to_redis_stream, bool)
+        # misc
+        assert isinstance(config.misc.short_uuid_length, (int, float))
+        assert isinstance(config.misc.sub_public_domain, str)
+        assert isinstance(config.misc.user_usage_ignore_below_bytes, (int, float))

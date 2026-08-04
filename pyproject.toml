@@ -1,7 +1,7 @@
 [project]
 name = "remnawave-api"
-version = "3.0.1"
-description = "A Python SDK for interacting with the Remnawave API v3.0.0."
+version = "3.2.0"
+description = "A Python SDK for interacting with the Remnawave API v3.2.0."
 authors = [
     {name = "Artem",email = "dev@forestsnet.com"}
 ]

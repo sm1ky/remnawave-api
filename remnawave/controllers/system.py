@@ -13,6 +13,7 @@ from remnawave.models import (
     DebugSrrMatcherResponseDto,
     GetMetadataResponseDto,
     GetRecapResponseDto,
+    GetConfigurationResponseDto,
 )
 from remnawave.rapid import BaseController, get, post
 
@@ -96,4 +97,11 @@ class SystemController(BaseController):
         self,
     ) -> GetHttpStatsResponseDto:
         """HTTP request counters per route"""
+        ...
+
+    @get("/system/configuration", response_class=GetConfigurationResponseDto)
+    async def get_configuration(
+        self,
+    ) -> GetConfigurationResponseDto:
+        """Get Remnawave Configuration"""
         ...

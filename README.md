@@ -33,6 +33,7 @@ pip install git+https://github.com/sm1ky/remnawave-api.git@development
 
 | Contract Version | Remnawave Panel Version |
 | ---------------- | ----------------------- |
+| 3.2.0            | >=3.2.0                 |
 | 3.0.1            | >=3.0.0                 |
 | 2.8.1            | >=2.8.0                 |
 | 2.8.0            | >=2.8.0                 |

@@ -104,6 +104,10 @@ class TestSystemControllerEndpoints:
         assert hasattr(SystemController, "get_stats_digest")
         assert hasattr(SystemController, "get_http_stats")
 
+    def test_has_get_configuration(self):
+        # New in v3.2.0
+        assert hasattr(SystemController, "get_configuration")
+
 
 class TestApiTokensControllerEndpoints:
     def test_has_get_scopes(self):
