@@ -119,11 +119,12 @@ class UserEventDto(BaseModel):
 
 class HwidUserDeviceDto(BaseModel):
     hwid: str
-    user_uuid: UUID
+    user_id: int
     platform: Optional[str] = None
     os_version: Optional[str] = None
     device_model: Optional[str] = None
     user_agent: Optional[str] = None
+    request_ip: Optional[str] = None
 
     created_at: datetime
     updated_at: datetime
