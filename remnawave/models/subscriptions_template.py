@@ -4,11 +4,13 @@ from uuid import UUID
 from pydantic import BaseModel, Field, StringConstraints
 
 from remnawave.enums import TemplateType
+from remnawave.models.tags import GetTagsResponseDto, SetTagsRequestDto, SetTagsResponseDto
 
 
 class TemplateResponseDto(BaseModel):
     uuid: UUID
     name: str
+    tags: List[str] = Field(default_factory=list)
     view_position: int = Field(alias="viewPosition")
     template_type: TemplateType = Field(alias="templateType")
     template_json: Any | None = Field(alias="templateJson")
@@ -19,6 +21,7 @@ class TemplateInfoDto(BaseModel):
     """Template info without content - used in list responses"""
     uuid: UUID
     name: str
+    tags: List[str] = Field(default_factory=list)
     view_position: int = Field(alias="viewPosition")
     template_type: TemplateType = Field(alias="templateType")
     template_json: Optional[Any] = Field(None, alias="templateJson")
@@ -88,4 +91,22 @@ class UpdateTemplateRequestDtoLegacy(BaseModel):
 
 
 class UpdateTemplateResponseDtoLegacy(TemplateResponseDto):
+    pass
+
+# ===== Tags (Remnawave API v3.4.0+) =====
+class GetSubscriptionTemplatesTagsResponseDto(GetTagsResponseDto):
+    """Response for ``GET /api/subscription-templates/tags``."""
+
+    pass
+
+
+class SetSubscriptionTemplatesTagsRequestDto(SetTagsRequestDto):
+    """Request body for ``PATCH /api/subscription-templates/tags``."""
+
+    pass
+
+
+class SetSubscriptionTemplatesTagsResponseDto(SetTagsResponseDto):
+    """Response for ``PATCH /api/subscription-templates/tags``."""
+
     pass

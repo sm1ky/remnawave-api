@@ -5,7 +5,13 @@ from pydantic import BaseModel, Field, RootModel, StringConstraints
 
 from remnawave.enums import ALPN, MihomoIpVersion, SecurityLayer, SubscriptionType
 from remnawave.models import HostResponseDto
-from remnawave.models.hosts import CreateHostInboundData, HostTag
+from remnawave.models.hosts import (
+    CreateHostInboundData,
+    HostInternalSquadsDto,
+    HostMapperDto,
+    HostTag,
+    _migrate_excluded_internal_squads,
+)
 
 
 class _HostListResponse(RootModel[List[HostResponseDto]]):
@@ -68,12 +74,26 @@ class UpdateManyHostsRequestDto(BaseModel):
     final_mask: Optional[Any] = Field(None, serialization_alias="finalMask")
     nodes: Optional[List[UUID]] = None
     xray_json_template_uuid: Optional[UUID] = Field(None, serialization_alias="xrayJsonTemplateUuid")
-    excluded_internal_squads: Optional[List[UUID]] = Field(None, serialization_alias="excludedInternalSquads")
+    internal_squads: Optional[HostInternalSquadsDto] = Field(
+        None,
+        serialization_alias="internalSquads",
+        description="Internal-squad visibility applied to every listed host.",
+    )
+    mapper: Optional[HostMapperDto] = Field(
+        None,
+        serialization_alias="mapper",
+        description="Operations applied to the entries generated for every listed host.",
+    )
     exclude_from_subscription_types: Optional[List[SubscriptionType]] = Field(
         None,
         serialization_alias="excludeFromSubscriptionTypes",
         description="Subscription types from which the hosts will be excluded.",
     )
+
+    def __init__(self, **data):
+        # Backward compatibility: `excluded_internal_squads` became `internal_squads` in v3.4.0
+        _migrate_excluded_internal_squads(data)
+        super().__init__(**data)
 
 
 class UpdateManyHostsResponseDto(_HostListResponse):

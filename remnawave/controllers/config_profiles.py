@@ -13,6 +13,9 @@ from remnawave.models import (
     GetInboundsByProfileUuidResponseDto,
     ReorderConfigProfilesRequestDto,
     ReorderConfigProfilesResponseDto,
+    GetConfigProfilesTagsResponseDto,
+    SetConfigProfilesTagsRequestDto,
+    SetConfigProfilesTagsResponseDto,
     UpdateConfigProfileRequestDto,
     UpdateConfigProfileResponseDto,
 )
@@ -85,4 +88,17 @@ class ConfigProfilesController(BaseController):
         uuid: Annotated[str, Path(description="UUID of the config profile")],
     ) -> GetConfigProfileByUuidResponseDto:
         """Get computed config profile by uuid"""
+        ...
+
+    @get("/config-profiles/tags", response_class=GetConfigProfilesTagsResponseDto)
+    async def get_config_profiles_tags(self) -> GetConfigProfilesTagsResponseDto:
+        """Get tags of Config Profiles"""
+        ...
+
+    @patch("/config-profiles/tags", response_class=SetConfigProfilesTagsResponseDto)
+    async def set_config_profile_tags(
+        self,
+        body: Annotated[SetConfigProfilesTagsRequestDto, PydanticBody()],
+    ) -> SetConfigProfilesTagsResponseDto:
+        """Set tags of Config Profile"""
         ...

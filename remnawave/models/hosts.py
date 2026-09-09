@@ -1,12 +1,87 @@
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, Field, StringConstraints, RootModel
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, RootModel
 
-from remnawave.enums import ALPN, MihomoIpVersion, SecurityLayer, SubscriptionType
+from remnawave.enums import (
+    ALPN,
+    InternalSquadsMode,
+    MihomoIpVersion,
+    SecurityLayer,
+    SubscriptionType,
+)
 
 # Tag for a single host tag entry: uppercase alphanumeric, underscores and colons, max 36 chars
 HostTag = Annotated[str, StringConstraints(max_length=36, pattern=r"^[A-Z0-9_:]+$")]
+
+# Dot-separated path inside a raw inbound / generated outbound (Remnawave API v3.4.0+)
+MapperPath = Annotated[str, StringConstraints(min_length=1, max_length=512)]
+
+
+class HostMapperCopyOp(BaseModel):
+    """Copy a value from the raw inbound (or from the host itself via ``$host.``)."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    op: Literal["copy"] = "copy"
+    from_: MapperPath = Field(alias="from", description="Source path")
+    to: MapperPath = Field(description="Target path in the generated entry")
+
+
+class HostMapperSetOp(BaseModel):
+    """Write a literal value into the generated entry."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    op: Literal["set"] = "set"
+    to: MapperPath = Field(description="Target path in the generated entry")
+    value: Any = Field(description="Literal value to write; required by the API")
+
+
+class HostMapperUnsetOp(BaseModel):
+    """Remove a key from the generated entry."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    op: Literal["unset"] = "unset"
+    to: MapperPath = Field(description="Target path in the generated entry")
+
+
+HostMapperOp = Annotated[
+    Union[HostMapperCopyOp, HostMapperSetOp, HostMapperUnsetOp],
+    Field(discriminator="op"),
+]
+
+
+class HostMapperDto(BaseModel):
+    """Per-subscription-format operations applied to the entry generated for a host."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    xray_json: Optional[List[HostMapperOp]] = Field(None, alias="xrayJson")
+    singbox: Optional[List[HostMapperOp]] = None
+    mihomo: Optional[List[HostMapperOp]] = None
+    base64: Optional[List[HostMapperOp]] = None
+
+
+class HostInternalSquadsDto(BaseModel):
+    """Internal-squad visibility of a host (replaces ``excludedInternalSquads`` in v3.4.0)."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    mode: InternalSquadsMode = InternalSquadsMode.EXCLUDE
+    squads: List[UUID] = Field(default_factory=list)
+
+
+def _migrate_excluded_internal_squads(data: Dict[str, Any]) -> None:
+    """Translate the pre-v3.4.0 `excluded_internal_squads` kwarg into `internal_squads`."""
+    if "excluded_internal_squads" not in data:
+        return
+    squads = data.pop("excluded_internal_squads")
+    if squads and "internal_squads" not in data:
+        data["internal_squads"] = HostInternalSquadsDto(
+            mode=InternalSquadsMode.EXCLUDE, squads=squads
+        )
 
 
 class ReorderHostItem(BaseModel):
@@ -58,7 +133,16 @@ class UpdateHostRequestDto(BaseModel):
     final_mask: Optional[Any] = Field(None, serialization_alias="finalMask")
     nodes: Optional[List[UUID]] = None
     xray_json_template_uuid: Optional[UUID] = Field(None, serialization_alias="xrayJsonTemplateUuid")
-    excluded_internal_squads: Optional[List[UUID]] = Field(None, serialization_alias="excludedInternalSquads")
+    internal_squads: Optional[HostInternalSquadsDto] = Field(
+        None,
+        serialization_alias="internalSquads",
+        description="Internal-squad visibility of this host.",
+    )
+    mapper: Optional[HostMapperDto] = Field(
+        None,
+        serialization_alias="mapper",
+        description="Operations applied to the entries generated for this host.",
+    )
     exclude_from_subscription_types: Optional[List[SubscriptionType]] = Field(
         None,
         serialization_alias="excludeFromSubscriptionTypes",
@@ -66,6 +150,8 @@ class UpdateHostRequestDto(BaseModel):
     )
 
     def __init__(self, **data):
+        # Backward compatibility: `excluded_internal_squads` became `internal_squads` in v3.4.0
+        _migrate_excluded_internal_squads(data)
         # Backward compatibility: `tag` (single value) was replaced by `tags` (list) in v2.8.0
         if "tag" in data and "tags" not in data:
             tag = data.pop("tag")
@@ -123,7 +209,16 @@ class HostResponseDto(BaseModel):
     override_sni_from_address: bool = Field(False, alias="overrideSniFromAddress")
     keep_blank_sni: bool = Field(False, alias="keepSniBlank")
     xray_json_template_uuid: UUID | None = Field(alias="xrayJsonTemplateUuid")
-    excluded_internal_squads: List[UUID] = Field(default_factory=list, alias="excludedInternalSquads")
+    internal_squads: HostInternalSquadsDto = Field(
+        default_factory=HostInternalSquadsDto,
+        alias="internalSquads",
+        description="Internal-squad visibility of this host.",
+    )
+    mapper: HostMapperDto = Field(
+        default_factory=HostMapperDto,
+        alias="mapper",
+        description="Operations applied to the entries generated for this host.",
+    )
     exclude_from_subscription_types: List[SubscriptionType] = Field(
         default_factory=list,
         alias="excludeFromSubscriptionTypes",
@@ -133,6 +228,13 @@ class HostResponseDto(BaseModel):
     @property
     def inbound_uuid(self) -> Optional[UUID]:
         return self.inbound.config_profile_inbound_uuid
+
+    @property
+    def excluded_internal_squads(self) -> List[UUID]:
+        """Backward compatibility property (replaced by `internal_squads` in v3.4.0)"""
+        if self.internal_squads.mode == InternalSquadsMode.EXCLUDE:
+            return self.internal_squads.squads
+        return []
 
     @property
     def x_http_extra_params(self) -> Dict[str, Any] | None:
@@ -179,7 +281,16 @@ class CreateHostRequestDto(BaseModel):
     override_sni_from_address: bool = Field(False, serialization_alias="overrideSniFromAddress")
     keep_blank_sni: bool = Field(False, serialization_alias="keepSniBlank")
     xray_json_template_uuid: Optional[UUID] = Field(None, serialization_alias="xrayJsonTemplateUuid")
-    excluded_internal_squads: List[UUID] = Field(default_factory=list, serialization_alias="excludedInternalSquads")
+    internal_squads: Optional[HostInternalSquadsDto] = Field(
+        None,
+        serialization_alias="internalSquads",
+        description="Internal-squad visibility of this host.",
+    )
+    mapper: Optional[HostMapperDto] = Field(
+        None,
+        serialization_alias="mapper",
+        description="Operations applied to the entries generated for this host.",
+    )
     exclude_from_subscription_types: List[SubscriptionType] = Field(
         default_factory=list,
         serialization_alias="excludeFromSubscriptionTypes",
@@ -209,6 +320,9 @@ class CreateHostRequestDto(BaseModel):
         # Backward-compatible support for misspelled helper argument used in old tests/examples
         if config_profile_uuid is None and "config_profile_inbound_uuid" in data:
             config_profile_uuid = data.pop("config_profile_inbound_uuid")
+
+        # Backward compatibility: `excluded_internal_squads` became `internal_squads` in v3.4.0
+        _migrate_excluded_internal_squads(data)
 
         if inbound_uuid is not None and "inbound" not in data:
             data["inbound"] = CreateHostInboundData(

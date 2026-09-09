@@ -11,6 +11,9 @@ from remnawave.models import (
     GetTemplatesResponseDto,
     ReorderSubscriptionTemplatesRequestDto,
     ReorderSubscriptionTemplatesResponseDto,
+    GetSubscriptionTemplatesTagsResponseDto,
+    SetSubscriptionTemplatesTagsRequestDto,
+    SetSubscriptionTemplatesTagsResponseDto,
     UpdateTemplateRequestDto,
     UpdateTemplateResponseDto,
 )
@@ -60,4 +63,17 @@ class SubscriptionsTemplateController(BaseController):
         body: Annotated[ReorderSubscriptionTemplatesRequestDto, PydanticBody()],
     ) -> ReorderSubscriptionTemplatesResponseDto:
         """Reorder subscription templates"""
+        ...
+
+    @get("/subscription-templates/tags", response_class=GetSubscriptionTemplatesTagsResponseDto)
+    async def get_subscription_templates_tags(self) -> GetSubscriptionTemplatesTagsResponseDto:
+        """Get tags of Subscription Templates"""
+        ...
+
+    @patch("/subscription-templates/tags", response_class=SetSubscriptionTemplatesTagsResponseDto)
+    async def set_subscription_template_tags(
+        self,
+        body: Annotated[SetSubscriptionTemplatesTagsRequestDto, PydanticBody()],
+    ) -> SetSubscriptionTemplatesTagsResponseDto:
+        """Set tags of Subscription Template"""
         ...

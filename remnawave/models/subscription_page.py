@@ -3,6 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
+from remnawave.models.tags import GetTagsResponseDto, SetTagsRequestDto, SetTagsResponseDto
+
 
 class SubscriptionPageConfigDto(BaseModel):
     """Subscription page config data model"""
@@ -11,6 +13,7 @@ class SubscriptionPageConfigDto(BaseModel):
     uuid: UUID
     view_position: int = Field(alias="viewPosition")
     name: str
+    tags: List[str] = Field(default_factory=list)
     config: Any | None
 
 
@@ -32,6 +35,7 @@ class GetSubscriptionPageConfigResponseDto(BaseModel):
     uuid: UUID
     view_position: int = Field(alias="viewPosition")
     name: str
+    tags: List[str] = Field(default_factory=list)
     config: Any
 
 
@@ -124,4 +128,22 @@ class SubpageConfigData(BaseModel):
 
 class GetSubpageConfigByShortUuidResponseDto(SubpageConfigData):
     """Response for getting subpage config by short UUID"""
+    pass
+
+# ===== Tags (Remnawave API v3.4.0+) =====
+class GetSubpageConfigsTagsResponseDto(GetTagsResponseDto):
+    """Response for ``GET /api/subscription-page-configs/tags``."""
+
+    pass
+
+
+class SetSubpageConfigsTagsRequestDto(SetTagsRequestDto):
+    """Request body for ``PATCH /api/subscription-page-configs/tags``."""
+
+    pass
+
+
+class SetSubpageConfigsTagsResponseDto(SetTagsResponseDto):
+    """Response for ``PATCH /api/subscription-page-configs/tags``."""
+
     pass

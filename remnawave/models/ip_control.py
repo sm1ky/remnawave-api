@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated, List, Literal, Optional, Union
+from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -41,9 +41,10 @@ class FetchIpsNodeResult(BaseModel):
 class FetchIpsResult(BaseModel):
     """Full result payload when the job is completed"""
     success: bool
-    user_uuid: UUID = Field(alias="userUuid")
-    user_id: str = Field(alias="userId")
+    user_id: int = Field(alias="userId", description="Numeric id of the user")
     nodes: List[FetchIpsNodeResult]
+    # Dropped by the panel in favour of `userId`; kept for backward compatibility.
+    user_uuid: Optional[UUID] = Field(None, alias="userUuid")
 
 
 class FetchIpsResultData(BaseModel):
@@ -141,7 +142,7 @@ class FetchUsersIpsUserIp(BaseModel):
 
 class FetchUsersIpsUser(BaseModel):
     """Per-user IP list"""
-    user_id: str = Field(alias="userId")
+    user_id: int = Field(alias="userId", description="Numeric id of the user")
     ips: List[FetchUsersIpsUserIp]
 
 
@@ -189,4 +190,61 @@ class DropConnectionsResponseData(BaseModel):
 
 class DropConnectionsResponseDto(DropConnectionsResponseData):
     """Response for POST /api/ip-control/drop-connections"""
+    pass
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Geocheck – step 1: start the job (Remnawave API v3.4.0+)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class GeocheckByNodeRequestDto(BaseModel):
+    """Request body for POST /api/connections/geocheck/{nodeUuid}"""
+    ip: Optional[str] = Field(None, description="Check from this IP address")
+    interface: Optional[str] = Field(None, description="Check from this network interface")
+
+
+class GeocheckJobData(BaseModel):
+    """Returned job ID after queueing a geocheck"""
+    job_id: str = Field(alias="jobId")
+
+
+class GeocheckByNodeResponseDto(GeocheckJobData):
+    """Response for POST /api/connections/geocheck/{nodeUuid}"""
+    pass
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Geocheck – step 2: poll the job result
+# ─────────────────────────────────────────────────────────────────────────────
+
+class GeocheckImageDto(BaseModel):
+    """Base64-encoded SVG report rendered by the node"""
+    format: Literal["svg"]
+    media_type: Literal["image/svg+xml"]
+    encoding: Literal["base64"]
+    data: str = Field(description="Base64-encoded image, ready for a data: URL")
+
+
+class GeocheckResult(BaseModel):
+    """Full geocheck payload when the job is completed"""
+    success: bool
+    node_uuid: UUID = Field(alias="nodeUuid")
+    image: Optional[GeocheckImageDto] = None
+    raw_report: Optional[Dict[str, Any]] = Field(
+        None,
+        alias="rawReport",
+        description="The full node report with the image object stripped out",
+    )
+    message: Optional[str] = None
+
+
+class GeocheckResultData(BaseModel):
+    """Job state + optional result"""
+    is_completed: bool = Field(alias="isCompleted")
+    is_failed: bool = Field(alias="isFailed")
+    result: Optional[GeocheckResult] = None
+
+
+class GeocheckByNodeResultResponseDto(GeocheckResultData):
+    """Response for GET /api/connections/geocheck/{jobId}"""
     pass

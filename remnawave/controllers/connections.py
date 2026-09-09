@@ -5,6 +5,9 @@ from rapid_api_client.annotations import PydanticBody
 
 from remnawave.models import (
     DropConnectionsRequestDto,
+    GeocheckByNodeRequestDto,
+    GeocheckByNodeResponseDto,
+    GeocheckByNodeResultResponseDto,
     FetchIpsResponseDto,
     FetchIpsResultResponseDto,
     FetchUsersIpsResponseDto,
@@ -54,4 +57,21 @@ class ConnectionsController(BaseController):
         body: Annotated[DropConnectionsRequestDto, PydanticBody()],
     ) -> None:
         """Drop active connections by user ids or IP addresses (202 Accepted)."""
+        ...
+
+    @post("/connections/geocheck/{nodeUuid}", response_class=GeocheckByNodeResponseDto)
+    async def request_geocheck_by_node(
+        self,
+        node_uuid: Annotated[str, Path(alias="nodeUuid", description="UUID of the node")],
+        body: Annotated[GeocheckByNodeRequestDto, PydanticBody()],
+    ) -> GeocheckByNodeResponseDto:
+        """Queue a geocheck on a node (returns a jobId; the node may take up to a minute)."""
+        ...
+
+    @get("/connections/geocheck/{jobId}", response_class=GeocheckByNodeResultResponseDto)
+    async def get_geocheck_by_node(
+        self,
+        job_id: Annotated[str, Path(alias="jobId", description="Job id returned by request_geocheck_by_node")],
+    ) -> GeocheckByNodeResultResponseDto:
+        """Get the result of a geocheck job."""
         ...

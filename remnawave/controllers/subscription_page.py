@@ -12,6 +12,9 @@ from remnawave.models import (
     GetSubscriptionPageConfigsResponseDto,
     ReorderSubscriptionPageConfigsRequestDto,
     ReorderSubscriptionPageConfigsResponseDto,
+    GetSubpageConfigsTagsResponseDto,
+    SetSubpageConfigsTagsRequestDto,
+    SetSubpageConfigsTagsResponseDto,
     UpdateSubscriptionPageConfigRequestDto,
     UpdateSubscriptionPageConfigResponseDto,
 )
@@ -70,4 +73,17 @@ class SubscriptionPageConfigController(BaseController):
         body: Annotated[CloneSubscriptionPageConfigRequestDto, PydanticBody()],
     ) -> CloneSubscriptionPageConfigResponseDto:
         """Clone subscription page config"""
+        ...
+
+    @get("/subscription-page-configs/tags", response_class=GetSubpageConfigsTagsResponseDto)
+    async def get_subpage_configs_tags(self) -> GetSubpageConfigsTagsResponseDto:
+        """Get tags of Subpage Configs"""
+        ...
+
+    @patch("/subscription-page-configs/tags", response_class=SetSubpageConfigsTagsResponseDto)
+    async def set_subpage_config_tags(
+        self,
+        body: Annotated[SetSubpageConfigsTagsRequestDto, PydanticBody()],
+    ) -> SetSubpageConfigsTagsResponseDto:
+        """Set tags of Subpage Config"""
         ...

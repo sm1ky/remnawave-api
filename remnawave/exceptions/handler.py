@@ -188,6 +188,63 @@ ERRORS: Dict[str, Type[ApiError]] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Panel error codes, taken from the error DTOs of the Remnawave OpenAPI document
+# (openapi/remna-3-4-3.json).
+#
+# Keyed by the raw code the panel sends rather than by ``ErrorCode`` member: a
+# number of members still carry values assigned by much older API versions, so
+# their names cannot be trusted to select the right exception. Applied after the
+# table above, which keeps the codes the panel no longer documents.
+#
+# A089, A219 are deliberately left out — the panel reuses each of them for
+# two unrelated errors, so the HTTP status is the only reliable signal.
+# ---------------------------------------------------------------------------
+_CONFLICT_CODES = (
+    "A019", "A020", "A021", "A033", "A034", "A045", "A098", "A164", "A176", "A189", "A210",
+    "A223", "A244", "A246"
+)
+
+_BAD_REQUEST_CODES = (
+    "A029", "A030", "A099", "A144", "A145", "A149", "A152", "A153", "A166", "A167", "A172",
+    "A173", "A174", "A175", "A178", "A180", "A190", "A194", "A195", "A209", "A212", "A215",
+    "A216", "A229", "A230", "A235"
+)
+
+_NOT_FOUND_CODES = (
+    "A007", "A011", "A012", "A025", "A046", "A062", "A063", "A065", "A071", "A076", "A111",
+    "A118", "A124", "A128", "A147", "A162", "A170", "A182", "A191", "A204", "A206", "A218",
+    "A220", "A226", "A238", "A245"
+)
+
+_SERVER_ERROR_CODES = (
+    "A001", "A002", "A005", "A006", "A008", "A009", "A010", "A013", "A014", "A015", "A016",
+    "A017", "A018", "A022", "A023", "A024", "A026", "A027", "A028", "A031", "A032", "A035",
+    "A036", "A037", "A038", "A039", "A040", "A041", "A042", "A043", "A044", "A047", "A048",
+    "A049", "A050", "A051", "A052", "A053", "A055", "A056", "A057", "A058", "A059", "A060",
+    "A064", "A066", "A067", "A069", "A070", "A072", "A073", "A074", "A075", "A077", "A078",
+    "A079", "A080", "A081", "A084", "A085", "A086", "A087", "A088", "A090", "A091", "A092",
+    "A093", "A096", "A097", "A100", "A101", "A102", "A103", "A104", "A105", "A106", "A107",
+    "A108", "A109", "A110", "A112", "A115", "A116", "A117", "A119", "A121", "A122", "A123",
+    "A125", "A126", "A127", "A129", "A130", "A131", "A132", "A133", "A134", "A135", "A136",
+    "A137", "A138", "A139", "A140", "A141", "A142", "A143", "A146", "A148", "A150", "A151",
+    "A154", "A155", "A156", "A157", "A158", "A159", "A160", "A161", "A163", "A165", "A168",
+    "A169", "A171", "A177", "A179", "A181", "A183", "A184", "A185", "A186", "A187", "A188",
+    "A192", "A193", "A196", "A197", "A198", "A199", "A200", "A201", "A202", "A203", "A205",
+    "A207", "A208", "A211", "A213", "A214", "A217", "A221", "A224", "A225", "A227", "A228",
+    "A232", "A233", "A234", "A236", "A237", "A239", "A240", "A241", "A242", "A243", "A247",
+    "A248", "A249", "A250", "A251", "A254", "A256", "A257"
+)
+
+for _codes, _exception in (
+    (_CONFLICT_CODES, ConflictError),
+    (_BAD_REQUEST_CODES, BadRequestError),
+    (_NOT_FOUND_CODES, NotFoundError),
+    (_SERVER_ERROR_CODES, ServerError),
+):
+    ERRORS.update(dict.fromkeys(_codes, _exception))
+
+
 def handle_api_error(response: httpx.Response) -> None:
     """Handle API error responses and raise appropriate exceptions"""
     if response.status_code >= 400:

@@ -7,6 +7,8 @@ from pydantic import BaseModel, Field
 class SubscriptionRequestHistoryRecord(BaseModel):
     id: int
     user_id: int = Field(alias="userId")
+    srr_response_type: Optional[str] = Field(None, alias="srrResponseType")
+    srr_rule_name: Optional[str] = Field(None, alias="srrRuleName")
     request_ip: Optional[str] = Field(None, alias="requestIp")
     user_agent: Optional[str] = Field(None, alias="userAgent")
     request_at: datetime = Field(alias="requestAt")

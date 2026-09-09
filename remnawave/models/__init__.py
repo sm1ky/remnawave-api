@@ -60,6 +60,9 @@ from .bandwidthstats import (
 )
 from .config_profiles import (
     ConfigProfileDto,
+    GetConfigProfilesTagsResponseDto,
+    SetConfigProfilesTagsRequestDto,
+    SetConfigProfilesTagsResponseDto,
     CreateConfigProfileRequestDto,
     CreateConfigProfileResponseDto,
     DeleteConfigProfileResponseDto,
@@ -78,6 +81,13 @@ from .config_profiles import (
 )
 from .hosts import (
     CreateHostInboundData,
+    HostInternalSquadsDto,
+    HostMapperCopyOp,
+    HostMapperDto,
+    HostMapperOp,
+    HostMapperSetOp,
+    HostMapperUnsetOp,
+    HostTag,
     CreateHostRequestDto,
     CreateHostResponseDto,
     DeleteHostResponseDto,
@@ -102,6 +112,7 @@ from .hosts_bulk_actions import (
 )
 from .hwid import (
     CreateHWIDUser,  # Legacy alias
+    PlatformStatItem,
     CreateUserHwidDeviceRequestDto,
     CreateUserHwidDeviceResponseDto,
     DeleteUserHwidDeviceRequestDto,
@@ -166,6 +177,9 @@ from .infra_billing import (
     GetAllInfraProvidersResponseDto,  # LEGACY
 )
 from .internal_squads import (
+    GetInternalSquadsTagsResponseDto,
+    SetInternalSquadsTagsRequestDto,
+    SetInternalSquadsTagsResponseDto,
     AddUsersToInternalSquadRequestDto,
     AddUsersToInternalSquadResponseDto,
     CreateInternalSquadRequestDto,
@@ -186,6 +200,7 @@ from .internal_squads import (
 from .keygen import GetNodeSecretKeyResponseDto
 from .nodes import (
     CreateNodeRequestDto,
+    NodeIpDto,
     CreateNodeResponseDto,
     DeleteNodeResponseDto,
     DisableNodeResponseDto,
@@ -239,6 +254,7 @@ from .subscription import (
     GetConnectionKeysByUuidResponseDto,
 )
 from .subscriptions_settings import (
+    ResponseModificationEncryption,
     GetSubscriptionSettingsResponseDto,
     ResponseModificationHeader,
     ResponseModifications,
@@ -257,6 +273,9 @@ from .subscriptions_settings import (
     HwidSettings,
 )
 from .subscriptions_template import (
+    GetSubscriptionTemplatesTagsResponseDto,
+    SetSubscriptionTemplatesTagsRequestDto,
+    SetSubscriptionTemplatesTagsResponseDto,
     CreateSubscriptionTemplateRequestDto,
     CreateSubscriptionTemplateResponseDto,
     DeleteSubscriptionTemplateResponseDto,
@@ -271,6 +290,7 @@ from .subscriptions_template import (
     UpdateTemplateResponseDto,
 )
 from .system import (
+    RuntimeMetric,
     GetStatsDigestResponseDto,
     GetHttpStatsResponseDto,
     GetConfigurationResponseDto,
@@ -420,6 +440,26 @@ from .metadata import (
     UpsertNodeMetadataResponseDto,
 )
 from .node_plugins import (
+    TorrentBlockerNodeDto,
+    TorrentBlockerStatsDto,
+    TorrentBlockerTopNodeDto,
+    TorrentBlockerTopUserDto,
+    TorrentBlockerUserDto,
+    CreateSharedListRequestDto,
+    CreateSharedListResponseDto,
+    DeleteSharedListRequestDto,
+    DeleteSharedListResponseDto,
+    GetNodePluginsTagsResponseDto,
+    GetSharedListResponseDto,
+    GetSharedListsResponseDto,
+    SetNodePluginsTagsRequestDto,
+    SetNodePluginsTagsResponseDto,
+    SharedListDto,
+    SharedListPreviewDto,
+    SyncNodePluginRequestDto,
+    SyncSharedListRequestDto,
+    UpdateSharedListRequestDto,
+    UpdateSharedListResponseDto,
     GetTorrentBlockerReportsResponseDto,
     GetTorrentBlockerReportsStatsResponseDto,
     TruncateTorrentBlockerReportsResponseDto,
@@ -447,6 +487,9 @@ from .node_plugins import (
     TargetSpecificNodesDto,
 )
 from .external_squads import (
+    GetExternalSquadsTagsResponseDto,
+    SetExternalSquadsTagsRequestDto,
+    SetExternalSquadsTagsResponseDto,
     AddUsersToExternalSquadResponseDto,
     CreateExternalSquadRequestDto,
     CreateExternalSquadResponseDto,
@@ -466,6 +509,7 @@ from .external_squads import (
     UpdateExternalSquadResponseDto,
 )
 from .snippets import (
+    SyncSnippetRequestDto,
     CreateSnippetRequestDto,
     CreateSnippetResponseDto,
     DeleteSnippetRequestDto,
@@ -493,6 +537,9 @@ from .remnawave_settings import (
     YandexOAuth2Settings,
 )
 from .subscription_page import (
+    GetSubpageConfigsTagsResponseDto,
+    SetSubpageConfigsTagsRequestDto,
+    SetSubpageConfigsTagsResponseDto,
     CloneSubscriptionPageConfigRequestDto,
     CloneSubscriptionPageConfigResponseDto,
     CreateSubscriptionPageConfigRequestDto,
@@ -535,6 +582,30 @@ from .ip_control import (
     FetchUsersIpsResult,
     FetchUsersIpsResultData,
     DropConnectionsResponseData,
+    # Geocheck (v3.4.0+)
+    GeocheckByNodeRequestDto,
+    GeocheckByNodeResponseDto,
+    GeocheckByNodeResultResponseDto,
+    GeocheckImageDto,
+    GeocheckJobData,
+    GeocheckResult,
+    GeocheckResultData,
+)
+from .node_integrations import (
+    CreateNodeIntegrationRequestDto,
+    CreateNodeIntegrationResponseDto,
+    DeleteNodeIntegrationResponseDto,
+    GetNodeIntegrationResponseDto,
+    GetNodeIntegrationsResponseDto,
+    NodeIntegrationDto,
+    UpdateNodeIntegrationRequestDto,
+    UpdateNodeIntegrationResponseDto,
+)
+from .tags import (
+    EntityTag,
+    GetTagsResponseDto,
+    SetTagsRequestDto,
+    SetTagsResponseDto,
 )
 
 __all__ = [
@@ -1066,4 +1137,72 @@ __all__ = [
     "NodePluginDto",
     "TargetAllNodesDto",
     "TargetSpecificNodesDto",
+
+    # ===== Remnawave API v3.4.x =====
+    "EntityTag",
+    "GetTagsResponseDto",
+    "SetTagsRequestDto",
+    "SetTagsResponseDto",
+    "GetConfigProfilesTagsResponseDto",
+    "SetConfigProfilesTagsRequestDto",
+    "SetConfigProfilesTagsResponseDto",
+    "GetInternalSquadsTagsResponseDto",
+    "SetInternalSquadsTagsRequestDto",
+    "SetInternalSquadsTagsResponseDto",
+    "GetExternalSquadsTagsResponseDto",
+    "SetExternalSquadsTagsRequestDto",
+    "SetExternalSquadsTagsResponseDto",
+    "GetNodePluginsTagsResponseDto",
+    "SetNodePluginsTagsRequestDto",
+    "SetNodePluginsTagsResponseDto",
+    "GetSubpageConfigsTagsResponseDto",
+    "SetSubpageConfigsTagsRequestDto",
+    "SetSubpageConfigsTagsResponseDto",
+    "GetSubscriptionTemplatesTagsResponseDto",
+    "SetSubscriptionTemplatesTagsRequestDto",
+    "SetSubscriptionTemplatesTagsResponseDto",
+    "NodeIntegrationDto",
+    "GetNodeIntegrationsResponseDto",
+    "GetNodeIntegrationResponseDto",
+    "CreateNodeIntegrationRequestDto",
+    "CreateNodeIntegrationResponseDto",
+    "UpdateNodeIntegrationRequestDto",
+    "UpdateNodeIntegrationResponseDto",
+    "DeleteNodeIntegrationResponseDto",
+    "SharedListDto",
+    "SharedListPreviewDto",
+    "GetSharedListsResponseDto",
+    "GetSharedListResponseDto",
+    "CreateSharedListRequestDto",
+    "CreateSharedListResponseDto",
+    "UpdateSharedListRequestDto",
+    "UpdateSharedListResponseDto",
+    "DeleteSharedListRequestDto",
+    "DeleteSharedListResponseDto",
+    "SyncSharedListRequestDto",
+    "SyncNodePluginRequestDto",
+    "HostTag",
+    "HostInternalSquadsDto",
+    "HostMapperDto",
+    "HostMapperOp",
+    "HostMapperCopyOp",
+    "HostMapperSetOp",
+    "HostMapperUnsetOp",
+    "NodeIpDto",
+    "GeocheckByNodeRequestDto",
+    "GeocheckByNodeResponseDto",
+    "GeocheckByNodeResultResponseDto",
+    "GeocheckImageDto",
+    "GeocheckJobData",
+    "GeocheckResult",
+    "GeocheckResultData",
+    "SyncSnippetRequestDto",
+    "ResponseModificationEncryption",
+    "PlatformStatItem",
+    "RuntimeMetric",
+    "TorrentBlockerNodeDto",
+    "TorrentBlockerStatsDto",
+    "TorrentBlockerTopNodeDto",
+    "TorrentBlockerTopUserDto",
+    "TorrentBlockerUserDto",
 ]

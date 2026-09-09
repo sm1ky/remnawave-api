@@ -25,6 +25,7 @@ from .snippets import SnippetsController
 from .remnawave_settings import RemnawaveSettingsController
 from .subscription_page import SubscriptionPageConfigController
 from .connections import ConnectionsController
+from .node_integrations import NodeIntegrationsController
 from .node_plugins import NodePluginsController
 from .metadata import MetadataController
 
@@ -56,6 +57,7 @@ __all__ = [
     "RemnawaveSettingsController",
     "SubscriptionPageConfigController",
     "ConnectionsController",
+    "NodeIntegrationsController",
     "NodePluginsController",
     "MetadataController",
 ]

@@ -45,5 +45,10 @@ async def remnawave() -> RemnawaveSDK:
     assert sdk.connections is not None
     assert sdk.hwid is not None
     assert sdk.node_plugins is not None
+    assert sdk.node_integrations is not None
+    assert sdk.config_profiles is not None
+    assert sdk.internal_squads is not None
+    assert sdk.external_squads is not None
+    assert sdk.snippets is not None
     assert sdk.metadata is not None
     return sdk

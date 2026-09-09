@@ -38,6 +38,10 @@ class UserResponseDto(BaseModel):
     username: str
     status: UserStatus = Field(default=UserStatus.ACTIVE)
     external_squad_uuid: Optional[UUID] = Field(None, alias="externalSquadUuid")
+    traffic_limit_bytes: Optional[float] = Field(None, alias="trafficLimitBytes")
+    traffic_limit_strategy: Optional[TrafficLimitStrategy] = Field(
+        None, alias="trafficLimitStrategy"
+    )
     user_traffic: UserTrafficDto = Field(alias="userTraffic")
     expire_at: datetime = Field(alias="expireAt")
     sub_revoked_at: Optional[datetime] = Field(None, alias="subRevokedAt")

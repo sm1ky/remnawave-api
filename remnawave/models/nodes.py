@@ -4,6 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, RootModel
 
+from remnawave.enums import NodeIpStatus
 from remnawave.models.internal_squads import InboundsDto
 from remnawave.models.webhook import NodeSystemDto, NodeVersionsDto
 
@@ -14,6 +15,15 @@ class ExcludedInbounds(BaseModel):
     type: str
     network: Optional[str] = None
     security: Optional[str] = None
+
+
+class NodeIpDto(BaseModel):
+    """An IP address declared on a node together with its role (v3.4.0+)."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    ip: str
+    status: NodeIpStatus
 
 
 class RestartEventResponse(BaseModel):
@@ -99,6 +109,12 @@ class CreateNodeRequestDto(BaseModel):
     active_plugin_uuid: Optional[UUID] = Field(
         None, serialization_alias="activePluginUuid"
     )
+    integration_uuids: Optional[List[UUID]] = Field(
+        None, serialization_alias="integrationUuids"
+    )
+    ips: Optional[List[NodeIpDto]] = Field(
+        None, serialization_alias="ips", max_length=64
+    )
 
 
 class UpdateNodeRequestDto(BaseModel):
@@ -145,6 +161,12 @@ class UpdateNodeRequestDto(BaseModel):
     active_plugin_uuid: Optional[UUID] = Field(
         None, serialization_alias="activePluginUuid"
     )
+    integration_uuids: Optional[List[UUID]] = Field(
+        None, serialization_alias="integrationUuids"
+    )
+    ips: Optional[List[NodeIpDto]] = Field(
+        None, serialization_alias="ips", max_length=64
+    )
 
 
 class ReorderNodeRequestDto(BaseModel):
@@ -153,6 +175,7 @@ class ReorderNodeRequestDto(BaseModel):
 
 class NodeResponseDto(BaseModel):
     uuid: UUID
+    id: Optional[int] = Field(None, alias="id", description="Numeric id of the node")
     name: str
     address: str
     port: Optional[int] = None
@@ -183,6 +206,8 @@ class NodeResponseDto(BaseModel):
     provider: Optional[NodeProviderDto] = None
     tags: List[str] = Field(default_factory=list, alias="tags")
     active_plugin_uuid: Optional[UUID] = Field(None, alias="activePluginUuid")
+    integration_uuids: List[UUID] = Field(default_factory=list, alias="integrationUuids")
+    ips: List[NodeIpDto] = Field(default_factory=list, alias="ips")
 
     @property
     def xray_version(self) -> Optional[str]:
@@ -351,6 +376,7 @@ class BulkNodesUpdateFieldsDto(BaseModel):
     provider_uuid: Optional[UUID] = Field(None, serialization_alias="providerUuid")
     tags: Optional[List[str]] = Field(None, serialization_alias="tags")
     active_plugin_uuid: Optional[UUID] = Field(None, serialization_alias="activePluginUuid")
+    integration_uuids: Optional[List[UUID]] = Field(None, serialization_alias="integrationUuids")
     note: Optional[str] = Field(None, serialization_alias="note")
 
 

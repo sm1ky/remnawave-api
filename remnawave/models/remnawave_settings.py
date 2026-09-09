@@ -23,6 +23,7 @@ class PocketIdOAuth2Settings(BaseModel):
     enabled: bool
     client_id: str | None = Field(alias="clientId")
     client_secret: str | None = Field(alias="clientSecret")
+    frontend_domain: str | None = Field(None, alias="frontendDomain")
     plain_domain: str | None = Field(alias="plainDomain")
     allowed_emails: List[str] = Field(alias="allowedEmails")
 
@@ -72,9 +73,9 @@ class OAuth2Settings(BaseModel):
     github: GitHubOAuth2Settings
     pocketid: PocketIdOAuth2Settings
     yandex: YandexOAuth2Settings
-    keycloak: KeycloakOAuth2Settings
-    generic: GenericOAuth2Settings
-    telegram: TelegramOAuth2Settings
+    keycloak: Optional[KeycloakOAuth2Settings] = None
+    generic: Optional[GenericOAuth2Settings] = None
+    telegram: Optional[TelegramOAuth2Settings] = None
 
 
 class TelegramAuthSettings(BaseModel):
