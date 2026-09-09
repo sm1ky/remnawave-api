@@ -4,6 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, StringConstraints
 
+from remnawave.models.tags import GetTagsResponseDto, SetTagsRequestDto, SetTagsResponseDto
+
 
 class InboundsDto(BaseModel):
     uuid: UUID
@@ -25,6 +27,7 @@ class InternalSquadDto(BaseModel):
     uuid: UUID
     view_position: int = Field(alias="viewPosition")
     name: str
+    tags: List[str] = Field(default_factory=list)
     info: Optional[InfoDto] = Field(default=None)
     inbounds: List[InboundsDto] = Field(default_factory=list)
     created_at: datetime = Field(alias="createdAt")
@@ -123,3 +126,22 @@ class AddManyUsersToInternalSquadBodyDto(BaseModel):
 
 class DeleteManyUsersFromInternalSquadBodyDto(BaseModel):
     user_ids: List[int] = Field(serialization_alias="userIds", min_length=1, max_length=1000)
+
+
+# ===== Tags (Remnawave API v3.4.0+) =====
+class GetInternalSquadsTagsResponseDto(GetTagsResponseDto):
+    """Response for ``GET /api/internal-squads/tags``."""
+
+    pass
+
+
+class SetInternalSquadsTagsRequestDto(SetTagsRequestDto):
+    """Request body for ``PATCH /api/internal-squads/tags``."""
+
+    pass
+
+
+class SetInternalSquadsTagsResponseDto(SetTagsResponseDto):
+    """Response for ``PATCH /api/internal-squads/tags``."""
+
+    pass

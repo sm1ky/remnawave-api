@@ -31,6 +31,7 @@ from remnawave.controllers import (
     RemnawaveSettingsController,
     SubscriptionPageConfigController,
     ConnectionsController,
+    NodeIntegrationsController,
     NodePluginsController,
     MetadataController,
 )
@@ -100,6 +101,7 @@ class RemnawaveSDK:
         self.subscription_page_config = SubscriptionPageConfigController(self._client)
         self.connections = ConnectionsController(self._client)
         self.node_plugins = NodePluginsController(self._client)
+        self.node_integrations = NodeIntegrationsController(self._client)
         self.metadata = MetadataController(self._client)
 
     def _validate_params(self) -> None:

@@ -5,6 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 from remnawave.models import CustomRemarksDto, HwidSettingsDto
+from remnawave.models.tags import GetTagsResponseDto, SetTagsRequestDto, SetTagsResponseDto
 
 
 class TemplateType(StrEnum):
@@ -51,6 +52,7 @@ class ExternalSquadDto(BaseModel):
     uuid: UUID
     view_position: int = Field(alias="viewPosition")
     name: str
+    tags: List[str] = Field(default_factory=list)
     info: ExternalSquadInfoDto
     templates: List[ExternalSquadTemplateDto]
     subscription_settings: Optional[ExternalSquadSubscriptionSettingsDto] = Field(None, alias="subscriptionSettings")
@@ -133,3 +135,21 @@ class AddUsersToExternalSquadResponseDto(BaseModel):
 class RemoveUsersFromExternalSquadResponseDto(BaseModel):
     """Response after removing users from external squad"""
     event_sent: bool = Field(alias="eventSent")
+
+# ===== Tags (Remnawave API v3.4.0+) =====
+class GetExternalSquadsTagsResponseDto(GetTagsResponseDto):
+    """Response for ``GET /api/external-squads/tags``."""
+
+    pass
+
+
+class SetExternalSquadsTagsRequestDto(SetTagsRequestDto):
+    """Request body for ``PATCH /api/external-squads/tags``."""
+
+    pass
+
+
+class SetExternalSquadsTagsResponseDto(SetTagsResponseDto):
+    """Response for ``PATCH /api/external-squads/tags``."""
+
+    pass

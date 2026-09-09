@@ -4,6 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, StringConstraints
 
+from remnawave.models.tags import GetTagsResponseDto, SetTagsRequestDto, SetTagsResponseDto
+
 
 class InboundDto(BaseModel):
     uuid: UUID
@@ -24,6 +26,7 @@ class ConfigProfileDto(BaseModel):
     uuid: UUID
     name: str
     view_position: int = Field(alias="viewPosition")
+    tags: List[str] = Field(default_factory=list)
     config: Dict[str, Any]
     inbounds: List[InboundDto]
     nodes: List[NodesProfileDto] = []
@@ -85,4 +88,23 @@ class ReorderConfigProfilesRequestDto(BaseModel):
 
 
 class ReorderConfigProfilesResponseDto(GetAllConfigProfilesResponsePaginated):
+    pass
+
+
+# ===== Tags (Remnawave API v3.4.0+) =====
+class GetConfigProfilesTagsResponseDto(GetTagsResponseDto):
+    """Response for ``GET /api/config-profiles/tags``."""
+
+    pass
+
+
+class SetConfigProfilesTagsRequestDto(SetTagsRequestDto):
+    """Request body for ``PATCH /api/config-profiles/tags``."""
+
+    pass
+
+
+class SetConfigProfilesTagsResponseDto(SetTagsResponseDto):
+    """Response for ``PATCH /api/config-profiles/tags``."""
+
     pass

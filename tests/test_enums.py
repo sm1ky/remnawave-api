@@ -4,7 +4,11 @@ import pytest
 from remnawave.enums import (
     ALPN,
     ClientType,
+    ErrorCode,
     Fingerprint,
+    HostMapperOperation,
+    InternalSquadsMode,
+    NodeIpStatus,
     OAuth2Provider,
     SecurityLayer,
     TemplateType,
@@ -129,3 +133,75 @@ class TestResponseType:
         }
         actual = {v.value for v in ResponseType}
         assert actual == expected
+
+
+class TestInternalSquadsMode:
+    """Host `internalSquads.mode` (Remnawave API v3.4.0+)."""
+
+    def test_all_values(self):
+        assert {mode.value for mode in InternalSquadsMode} == {"EXCLUDE", "ALLOW_ONLY"}
+
+
+class TestHostMapperOperation:
+    """Host mapper operations (Remnawave API v3.4.0+)."""
+
+    def test_all_values(self):
+        assert {op.value for op in HostMapperOperation} == {"copy", "set", "unset"}
+
+
+class TestNodeIpStatus:
+    """Node IP roles (Remnawave API v3.4.0+)."""
+
+    def test_all_api_values(self):
+        assert {status.value for status in NodeIpStatus} == {
+            "INBOUND",
+            "OUTBOUND",
+            "MANAGEMENT",
+            "TRANSIT",
+            "MONITORING",
+            "RESERVE",
+            "BLOCKED",
+            "FLAGGED",
+            "DEPRECATED",
+            "UNKNOWN",
+        }
+
+
+class TestErrorCodesV340:
+    """Error codes introduced by Remnawave API v3.4.0."""
+
+    @pytest.mark.parametrize(
+        "member, code",
+        [
+            ("SYNC_SNIPPET_ERROR", "A237"),
+            ("NODE_INTEGRATION_NOT_FOUND", "A238"),
+            ("GET_ALL_NODE_INTEGRATIONS_ERROR", "A239"),
+            ("GET_NODE_INTEGRATION_BY_UUID_ERROR", "A240"),
+            ("CREATE_NODE_INTEGRATION_ERROR", "A241"),
+            ("UPDATE_NODE_INTEGRATION_ERROR", "A242"),
+            ("DELETE_NODE_INTEGRATION_ERROR", "A243"),
+            ("NODE_INTEGRATION_NAME_ALREADY_EXISTS", "A244"),
+            ("SHARED_LIST_NOT_FOUND", "A245"),
+            ("SHARED_LIST_NAME_ALREADY_EXISTS", "A246"),
+            ("GET_ALL_SHARED_LISTS_ERROR", "A247"),
+            ("GET_SHARED_LIST_BY_NAME_ERROR", "A248"),
+            ("CREATE_SHARED_LIST_ERROR", "A249"),
+            ("UPDATE_SHARED_LIST_ERROR", "A250"),
+            ("DELETE_SHARED_LIST_ERROR", "A251"),
+            ("CREATE_SSH_TICKET_ERROR", "A254"),
+            ("GET_TAGS_ERROR", "A256"),
+            ("SET_TAGS_ERROR", "A257"),
+        ],
+    )
+    def test_code_value(self, member, code):
+        assert getattr(ErrorCode, member).value == code
+
+    def test_codes_are_mapped_to_exceptions(self):
+        from remnawave.exceptions import ConflictError, NotFoundError, ServerError
+        from remnawave.exceptions.handler import ERRORS
+
+        assert ERRORS[ErrorCode.NODE_INTEGRATION_NOT_FOUND] is NotFoundError
+        assert ERRORS[ErrorCode.SHARED_LIST_NOT_FOUND] is NotFoundError
+        assert ERRORS[ErrorCode.NODE_INTEGRATION_NAME_ALREADY_EXISTS] is ConflictError
+        assert ERRORS[ErrorCode.SHARED_LIST_NAME_ALREADY_EXISTS] is ConflictError
+        assert ERRORS[ErrorCode.SET_TAGS_ERROR] is ServerError

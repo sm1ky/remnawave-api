@@ -120,6 +120,14 @@ class RuntimeMetric(BaseModel):
     heap_total: Optional[float] = Field(None, alias="heapTotal")
     heap_used: Optional[float] = Field(None, alias="heapUsed")
     external: Optional[float] = None
+    array_buffers: Optional[float] = Field(None, alias="arrayBuffers")
+    event_loop_delay_ms: Optional[float] = Field(None, alias="eventLoopDelayMs")
+    event_loop_p99_ms: Optional[float] = Field(None, alias="eventLoopP99Ms")
+    active_handles: Optional[float] = Field(None, alias="activeHandles")
+    uptime: Optional[float] = None
+    pid: Optional[float] = None
+    timestamp: Optional[float] = None
+    instance_id: Optional[str] = Field(None, alias="instanceId")
     instance_type: Optional[str] = Field(None, alias="instanceType")
 
 

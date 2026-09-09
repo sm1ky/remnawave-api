@@ -8,6 +8,7 @@ from remnawave.models import (
     DeleteSnippetRequestDto,
     DeleteSnippetResponseDto,
     GetSnippetsResponseDto,
+    SyncSnippetRequestDto,
     UpdateSnippetRequestDto,
     UpdateSnippetResponseDto,
 )
@@ -42,4 +43,12 @@ class SnippetsController(BaseController):
         body: Annotated[DeleteSnippetRequestDto, PydanticBody()],
     ) -> DeleteSnippetResponseDto:
         """Delete snippet"""
+        ...
+
+    @post("/snippets/actions/sync", response_class=None)
+    async def sync_snippet(
+        self,
+        body: Annotated[SyncSnippetRequestDto, PydanticBody()],
+    ) -> None:
+        """Sync a snippet to every config profile that references it (202 Accepted)"""
         ...

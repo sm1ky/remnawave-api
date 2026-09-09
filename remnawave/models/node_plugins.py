@@ -1,13 +1,17 @@
 from datetime import datetime
-from typing import Any, Annotated, List, Literal, Optional, Union
+from typing import Any, Annotated, Dict, List, Literal, Optional, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
+from remnawave.models.tags import GetTagsResponseDto, SetTagsRequestDto, SetTagsResponseDto
+
 
 class TorrentBlockerUserDto(BaseModel):
-    uuid: UUID
+    model_config = ConfigDict(populate_by_name=True)
+
     username: str
+    uuid: Optional[UUID] = None
 
 
 class TorrentBlockerNodeDto(BaseModel):
@@ -89,10 +93,13 @@ class TorrentBlockerStatsDto(BaseModel):
 
 
 class TorrentBlockerTopUserDto(BaseModel):
-    uuid: UUID
+    model_config = ConfigDict(populate_by_name=True)
+
     color: str
     username: str
     total: float
+    user_id: Optional[int] = Field(default=None, alias="userId")
+    uuid: Optional[UUID] = None
 
 
 class TorrentBlockerTopNodeDto(BaseModel):
@@ -119,6 +126,7 @@ class NodePluginDto(BaseModel):
     uuid: UUID
     view_position: int = Field(alias="viewPosition")
     name: str
+    tags: List[str] = Field(default_factory=list)
     plugin_config: Any | None = Field(alias="pluginConfig")
 
 
@@ -233,3 +241,136 @@ class PluginExecutorResponseDto(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     event_sent: bool = Field(alias="eventSent")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Sync (Remnawave API v3.4.0+)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class SyncNodePluginRequestDto(BaseModel):
+    """Request body for ``POST /api/node-plugins/actions/sync``."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    uuid: UUID
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Shared lists (Remnawave API v3.4.0+)
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Shared list names support "folders" but, unlike snippets, no spaces.
+SharedListName = Annotated[
+    str,
+    StringConstraints(min_length=2, max_length=255, pattern=r"^[A-Za-z0-9_-]+(\/[A-Za-z0-9_-]+)*$"),
+]
+
+
+class SharedListPreviewDto(BaseModel):
+    """Shared list without its items — name, type and item count only."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    name: str
+    type: str
+    items_count: float = Field(alias="itemsCount")
+
+
+class GetSharedListsResponseDto(BaseModel):
+    """Response for ``GET /api/node-plugins/shared-lists``."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    total: float
+    shared_lists: List[SharedListPreviewDto] = Field(alias="sharedLists")
+
+
+class SharedListDto(BaseModel):
+    """A shared list together with its full config."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    name: str
+    config: Dict[str, Any] = Field(default_factory=dict)
+
+
+class GetSharedListResponseDto(SharedListDto):
+    """Response for ``GET /api/node-plugins/shared-lists/by-name``."""
+
+    pass
+
+
+class CreateSharedListRequestDto(BaseModel):
+    """Request body for ``POST /api/node-plugins/shared-lists``."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    name: SharedListName
+    config: Dict[str, Any]
+
+
+class CreateSharedListResponseDto(SharedListDto):
+    """Response for ``POST /api/node-plugins/shared-lists``."""
+
+    pass
+
+
+class UpdateSharedListRequestDto(BaseModel):
+    """Request body for ``PATCH /api/node-plugins/shared-lists``."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    name: SharedListName
+    config: Dict[str, Any]
+
+
+class UpdateSharedListResponseDto(SharedListDto):
+    """Response for ``PATCH /api/node-plugins/shared-lists``."""
+
+    pass
+
+
+class DeleteSharedListRequestDto(BaseModel):
+    """Request body for ``DELETE /api/node-plugins/shared-lists``."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    name: SharedListName
+
+
+class DeleteSharedListResponseDto(BaseModel):
+    """Response for ``DELETE /api/node-plugins/shared-lists`` (204 No Content)."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    is_deleted: bool = Field(alias="isDeleted")
+
+
+class SyncSharedListRequestDto(BaseModel):
+    """Request body for ``POST /api/node-plugins/shared-lists/actions/sync``."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    name: SharedListName
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Tags (Remnawave API v3.4.0+)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class GetNodePluginsTagsResponseDto(GetTagsResponseDto):
+    """Response for ``GET /api/node-plugins/tags``."""
+
+    pass
+
+
+class SetNodePluginsTagsRequestDto(SetTagsRequestDto):
+    """Request body for ``PATCH /api/node-plugins/tags``."""
+
+    pass
+
+
+class SetNodePluginsTagsResponseDto(SetTagsResponseDto):
+    """Response for ``PATCH /api/node-plugins/tags``."""
+
+    pass

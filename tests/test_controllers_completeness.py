@@ -1,5 +1,7 @@
-"""Tests that all required endpoints exist in controllers (Remnawave API v3.0.0)."""
+"""Tests that all required endpoints exist in controllers (Remnawave API v3.4.3)."""
 import pytest
+
+from remnawave import RemnawaveSDK
 
 from remnawave.controllers.users import UsersController
 from remnawave.controllers.system import SystemController
@@ -8,6 +10,13 @@ from remnawave.controllers.api_tokens_management import APITokensManagementContr
 from remnawave.controllers.hosts_bulk_actions import HostsBulkActionsController
 from remnawave.controllers.bandwidthstats import BandWidthStatsController
 from remnawave.controllers.internal_squads import InternalSquadsController
+from remnawave.controllers.config_profiles import ConfigProfilesController
+from remnawave.controllers.external_squads import ExternalSquadsController
+from remnawave.controllers.node_integrations import NodeIntegrationsController
+from remnawave.controllers.node_plugins import NodePluginsController
+from remnawave.controllers.snippets import SnippetsController
+from remnawave.controllers.subscription_page import SubscriptionPageConfigController
+from remnawave.controllers.subscriptions_template import SubscriptionsTemplateController
 
 
 class TestUsersControllerEndpoints:
@@ -167,3 +176,84 @@ class TestInternalSquadsControllerEndpoints:
     def test_has_remove_many_users(self):
         # New in v3.0.0
         assert hasattr(InternalSquadsController, "remove_many_users_from_internal_squad")
+
+
+class TestNodePluginsControllerEndpoints:
+    """Shared lists, sync and tags are new in v3.4.0."""
+
+    def test_has_plugin_crud(self):
+        assert hasattr(NodePluginsController, "get_all_node_plugins")
+        assert hasattr(NodePluginsController, "create_node_plugin")
+        assert hasattr(NodePluginsController, "update_node_plugin")
+        assert hasattr(NodePluginsController, "delete_node_plugin")
+
+    def test_has_sync_node_plugin(self):
+        assert hasattr(NodePluginsController, "sync_node_plugin")
+
+    def test_has_tags(self):
+        assert hasattr(NodePluginsController, "get_node_plugins_tags")
+        assert hasattr(NodePluginsController, "set_node_plugin_tags")
+
+    def test_has_shared_lists(self):
+        assert hasattr(NodePluginsController, "get_all_shared_lists")
+        assert hasattr(NodePluginsController, "get_shared_list_by_name")
+        assert hasattr(NodePluginsController, "create_shared_list")
+        assert hasattr(NodePluginsController, "update_shared_list")
+        assert hasattr(NodePluginsController, "delete_shared_list_by_name")
+        assert hasattr(NodePluginsController, "sync_shared_list")
+
+
+class TestNodeIntegrationsControllerEndpoints:
+    """New controller in v3.4.0."""
+
+    def test_has_crud(self):
+        assert hasattr(NodeIntegrationsController, "get_all_node_integrations")
+        assert hasattr(NodeIntegrationsController, "get_node_integration_by_uuid")
+        assert hasattr(NodeIntegrationsController, "create_node_integration")
+        assert hasattr(NodeIntegrationsController, "update_node_integration")
+        assert hasattr(NodeIntegrationsController, "delete_node_integration")
+
+    def test_registered_on_sdk(self):
+        assert hasattr(RemnawaveSDK, "__init__")
+        sdk = RemnawaveSDK(base_url="https://panel.example", token="token")
+        assert isinstance(sdk.node_integrations, NodeIntegrationsController)
+
+
+class TestGeocheckEndpoints:
+    """New in v3.4.0."""
+
+    def test_has_request_geocheck(self):
+        assert hasattr(ConnectionsController, "request_geocheck_by_node")
+
+    def test_has_get_geocheck(self):
+        assert hasattr(ConnectionsController, "get_geocheck_by_node")
+
+
+class TestSnippetsControllerEndpoints:
+    def test_has_sync_snippet(self):
+        # New in v3.4.0
+        assert hasattr(SnippetsController, "sync_snippet")
+
+
+class TestTagsEndpoints:
+    """GET/PATCH .../tags pairs added in v3.4.0."""
+
+    def test_config_profiles(self):
+        assert hasattr(ConfigProfilesController, "get_config_profiles_tags")
+        assert hasattr(ConfigProfilesController, "set_config_profile_tags")
+
+    def test_internal_squads(self):
+        assert hasattr(InternalSquadsController, "get_internal_squads_tags")
+        assert hasattr(InternalSquadsController, "set_internal_squad_tags")
+
+    def test_external_squads(self):
+        assert hasattr(ExternalSquadsController, "get_external_squads_tags")
+        assert hasattr(ExternalSquadsController, "set_external_squad_tags")
+
+    def test_subscription_page_configs(self):
+        assert hasattr(SubscriptionPageConfigController, "get_subpage_configs_tags")
+        assert hasattr(SubscriptionPageConfigController, "set_subpage_config_tags")
+
+    def test_subscription_templates(self):
+        assert hasattr(SubscriptionsTemplateController, "get_subscription_templates_tags")
+        assert hasattr(SubscriptionsTemplateController, "set_subscription_template_tags")

@@ -2,7 +2,8 @@ import random
 
 import pytest
 
-from remnawave.enums import ALPN, Fingerprint, SecurityLayer
+from remnawave.enums import ALPN, Fingerprint, InternalSquadsMode, SecurityLayer
+from remnawave.exceptions import NotFoundError
 from remnawave.exceptions.general import ApiError
 from remnawave.models import (
     CreateHostRequestDto,
@@ -16,6 +17,13 @@ from remnawave.models import (
     UpdateHostRequestDto,
     UpdateHostResponseDto,
     GetAllHostTagsResponseDto,
+    CreateInternalSquadRequestDto,
+    HostInternalSquadsDto,
+    HostMapperCopyOp,
+    HostMapperDto,
+    HostMapperSetOp,
+    HostMapperUnsetOp,
+    UpdateManyHostsRequestDto,
 )
 from tests.conftest import REMNAWAVE_INBOUND_UUID, REMNAWAVE_CONFIG_PROFILE_UUID
 from tests.utils import generate_random_string
@@ -256,3 +264,156 @@ class TestHostsAdvanced:
         
         # Очистка - удаление созданного хоста
         await remnawave.hosts.delete_host(uuid=str(create_host.uuid))
+
+
+class TestHostInternalSquadsAndMapper:
+    """`internalSquads` вместо `excludedInternalSquads` и новый `mapper` (v3.4.0)"""
+
+    @pytest.fixture
+    async def internal_squad(self, remnawave):
+        created = await remnawave.internal_squads.create_internal_squad(
+            CreateInternalSquadRequestDto(
+                name=f"host_tags_{generate_random_string(length=6)}",
+                inbounds=[REMNAWAVE_INBOUND_UUID],
+            )
+        )
+        yield created
+        try:
+            await remnawave.internal_squads.delete_internal_squad(str(created.uuid))
+        except NotFoundError:
+            pass
+
+    @pytest.fixture
+    async def host(self, remnawave):
+        created = await remnawave.hosts.create_host(
+            CreateHostRequestDto(
+                inbound_uuid=REMNAWAVE_INBOUND_UUID,
+                config_profile_inbound_uuid=REMNAWAVE_CONFIG_PROFILE_UUID,
+                remark=generate_random_string(),
+                address=f"{random.randint(500, 800)}.0.0.1",
+                port=random.randint(5000, 8000),
+            )
+        )
+        yield created
+        try:
+            await remnawave.hosts.delete_host(uuid=str(created.uuid))
+        except NotFoundError:
+            pass
+
+    @pytest.mark.asyncio
+    async def test_all_hosts_expose_new_fields(self, remnawave):
+        """Список хостов разбирается вместе с internalSquads/mapper"""
+        all_hosts = await remnawave.hosts.get_all_hosts()
+        for host in all_hosts:
+            assert isinstance(host.internal_squads, HostInternalSquadsDto)
+            assert host.internal_squads.mode in set(InternalSquadsMode)
+            assert isinstance(host.mapper, HostMapperDto)
+
+    @pytest.mark.asyncio
+    async def test_new_host_defaults_to_exclude_mode(self, host):
+        """Новый хост создаётся в режиме EXCLUDE с пустым списком сквадов"""
+        assert host.internal_squads.mode == InternalSquadsMode.EXCLUDE
+        assert host.internal_squads.squads == []
+        assert host.excluded_internal_squads == []
+
+    @pytest.mark.asyncio
+    async def test_set_allow_only_internal_squads(self, remnawave, host, internal_squad):
+        """Режим ALLOW_ONLY сохраняется и читается обратно"""
+        updated = await remnawave.hosts.update_host(
+            UpdateHostRequestDto(
+                uuid=host.uuid,
+                internal_squads=HostInternalSquadsDto(
+                    mode=InternalSquadsMode.ALLOW_ONLY, squads=[internal_squad.uuid]
+                ),
+            )
+        )
+
+        assert updated.internal_squads.mode == InternalSquadsMode.ALLOW_ONLY
+        assert updated.internal_squads.squads == [internal_squad.uuid]
+        # В режиме ALLOW_ONLY legacy-свойство пустое
+        assert updated.excluded_internal_squads == []
+
+        fetched = await remnawave.hosts.get_one_host(uuid=str(host.uuid))
+        assert fetched.internal_squads.squads == [internal_squad.uuid]
+
+    @pytest.mark.asyncio
+    async def test_legacy_excluded_internal_squads_kwarg(
+        self, remnawave, host, internal_squad
+    ):
+        """Старый kwarg `excluded_internal_squads` по-прежнему работает"""
+        updated = await remnawave.hosts.update_host(
+            UpdateHostRequestDto(
+                uuid=host.uuid,
+                excluded_internal_squads=[internal_squad.uuid],
+            )
+        )
+
+        assert updated.internal_squads.mode == InternalSquadsMode.EXCLUDE
+        assert updated.internal_squads.squads == [internal_squad.uuid]
+        assert updated.excluded_internal_squads == [internal_squad.uuid]
+
+    @pytest.mark.asyncio
+    async def test_set_mapper_operations(self, remnawave, host):
+        """Операции mapper сохраняются панелью"""
+        updated = await remnawave.hosts.update_host(
+            UpdateHostRequestDto(
+                uuid=host.uuid,
+                mapper=HostMapperDto(
+                    xray_json=[
+                        HostMapperCopyOp(
+                            from_="streamSettings.tlsSettings.alpn",
+                            to="streamSettings.tlsSettings.alpn",
+                        ),
+                        HostMapperUnsetOp(to="mux"),
+                    ],
+                    mihomo=[HostMapperSetOp(to="ip-version", value="dual")],
+                ),
+            )
+        )
+
+        assert len(updated.mapper.xray_json) == 2
+        assert updated.mapper.xray_json[0].from_ == "streamSettings.tlsSettings.alpn"
+        assert updated.mapper.xray_json[1].op == "unset"
+        assert updated.mapper.mihomo[0].value == "dual"
+
+        fetched = await remnawave.hosts.get_one_host(uuid=str(host.uuid))
+        assert fetched.mapper.mihomo[0].to == "ip-version"
+
+    @pytest.mark.asyncio
+    async def test_create_host_with_internal_squads(self, remnawave, internal_squad):
+        """Хост создаётся сразу с internalSquads"""
+        created = await remnawave.hosts.create_host(
+            CreateHostRequestDto(
+                inbound_uuid=REMNAWAVE_INBOUND_UUID,
+                config_profile_inbound_uuid=REMNAWAVE_CONFIG_PROFILE_UUID,
+                remark=generate_random_string(),
+                address=f"{random.randint(500, 800)}.0.0.1",
+                port=random.randint(5000, 8000),
+                internal_squads=HostInternalSquadsDto(
+                    mode=InternalSquadsMode.ALLOW_ONLY, squads=[internal_squad.uuid]
+                ),
+            )
+        )
+
+        try:
+            assert created.internal_squads.mode == InternalSquadsMode.ALLOW_ONLY
+            assert created.internal_squads.squads == [internal_squad.uuid]
+        finally:
+            await remnawave.hosts.delete_host(uuid=str(created.uuid))
+
+    @pytest.mark.asyncio
+    async def test_bulk_update_internal_squads(self, remnawave, host, internal_squad):
+        """Массовое обновление хостов принимает internalSquads"""
+        updated = await remnawave.hosts_bulk_actions.update_hosts(
+            UpdateManyHostsRequestDto(
+                uuids=[host.uuid],
+                internal_squads=HostInternalSquadsDto(
+                    mode=InternalSquadsMode.EXCLUDE, squads=[internal_squad.uuid]
+                ),
+            )
+        )
+
+        # PATCH /hosts/bulk/update отвечает 204 No Content
+        assert updated is None
+        fetched = await remnawave.hosts.get_one_host(uuid=str(host.uuid))
+        assert fetched.internal_squads.squads == [internal_squad.uuid]

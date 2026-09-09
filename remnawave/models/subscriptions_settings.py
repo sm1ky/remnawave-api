@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated, Dict, List, Optional
+from typing import Annotated, Dict, List, Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field, StringConstraints
@@ -11,6 +11,7 @@ from remnawave.enums import (
     ResponseType,
     SubscriptionType,
 )
+from remnawave.models.hosts import HostTag
 
 
 class ResponseRuleCondition(BaseModel):
@@ -27,6 +28,12 @@ class ResponseModificationHeader(BaseModel):
     """Response header modification"""
     key: Annotated[str, StringConstraints(pattern=r"^[!#$%&'*+\-.0-9A-Z^_`a-z|~]+$")]
     value: Annotated[str, StringConstraints(min_length=1)]
+
+
+class ResponseModificationEncryption(BaseModel):
+    """Encryption applied to the response body when the rule matches"""
+    method: Literal["age1", "age1pq1"]
+    key: str
 
 
 class ResponseModifications(BaseModel):
@@ -57,6 +64,35 @@ class ResponseModifications(BaseModel):
         description=(
             "If True, the Serve JSON at Base Subscription setting is ignored "
             "(treated as False)."
+        ),
+    )
+    additional_extended_clients_regex: Optional[
+        List[Annotated[str, StringConstraints(min_length=1)]]
+    ] = Field(
+        None,
+        alias="additionalExtendedClientsRegex",
+        description="Extra user-agent patterns treated as extended clients.",
+    )
+    disable_hwid_check: Optional[bool] = Field(
+        None,
+        alias="disableHwidCheck",
+        description="If True, the HWID device check is skipped for the matched request.",
+    )
+    encryption: Optional[ResponseModificationEncryption] = Field(
+        None, description="Encrypt the response body with the given method and key."
+    )
+    exclude_hosts_by_tags: Optional[List[HostTag]] = Field(
+        None,
+        alias="excludeHostsByTags",
+        min_length=1,
+        description="Hosts carrying any of these tags are excluded from the response.",
+    )
+    respond_with_remarks: Optional[List[str]] = Field(
+        None,
+        alias="respondWithRemarks",
+        description=(
+            "Replaces the response body with the given remarks. With more than one "
+            "element no actual hosts are sent."
         ),
     )
 

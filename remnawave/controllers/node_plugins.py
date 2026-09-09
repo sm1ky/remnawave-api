@@ -8,18 +8,31 @@ from remnawave.models import (
     CloneNodePluginResponseDto,
     CreateNodePluginRequestDto,
     CreateNodePluginResponseDto,
+    CreateSharedListRequestDto,
+    CreateSharedListResponseDto,
     DeleteNodePluginResponseDto,
+    DeleteSharedListRequestDto,
+    DeleteSharedListResponseDto,
     GetNodePluginResponseDto,
     GetNodePluginsResponseDto,
+    GetNodePluginsTagsResponseDto,
+    GetSharedListResponseDto,
+    GetSharedListsResponseDto,
     GetTorrentBlockerReportsResponseDto,
     GetTorrentBlockerReportsStatsResponseDto,
     PluginExecutorRequestDto,
     PluginExecutorResponseDto,
     ReorderNodePluginsRequestDto,
     ReorderNodePluginsResponseDto,
+    SetNodePluginsTagsRequestDto,
+    SetNodePluginsTagsResponseDto,
+    SyncNodePluginRequestDto,
+    SyncSharedListRequestDto,
     TruncateTorrentBlockerReportsResponseDto,
     UpdateNodePluginRequestDto,
     UpdateNodePluginResponseDto,
+    UpdateSharedListRequestDto,
+    UpdateSharedListResponseDto,
 )
 from remnawave.rapid import BaseController, delete, get, patch, post
 
@@ -107,4 +120,70 @@ class NodePluginsController(BaseController):
         body: Annotated[PluginExecutorRequestDto, PydanticBody()],
     ) -> PluginExecutorResponseDto:
         """Execute command on node plugins"""
+        ...
+
+    @post("/node-plugins/actions/sync", response_class=None)
+    async def sync_node_plugin(
+        self,
+        body: Annotated[SyncNodePluginRequestDto, PydanticBody()],
+    ) -> None:
+        """Push the plugin config, including its shared lists, to every node it is active on (202 Accepted)"""
+        ...
+
+    @get("/node-plugins/tags", response_class=GetNodePluginsTagsResponseDto)
+    async def get_node_plugins_tags(self) -> GetNodePluginsTagsResponseDto:
+        """Get tags of Node Plugins"""
+        ...
+
+    @patch("/node-plugins/tags", response_class=SetNodePluginsTagsResponseDto)
+    async def set_node_plugin_tags(
+        self,
+        body: Annotated[SetNodePluginsTagsRequestDto, PydanticBody()],
+    ) -> SetNodePluginsTagsResponseDto:
+        """Set tags of Node Plugin"""
+        ...
+
+    @get("/node-plugins/shared-lists", response_class=GetSharedListsResponseDto)
+    async def get_all_shared_lists(self) -> GetSharedListsResponseDto:
+        """Get Shared Lists (name, type and item count only)"""
+        ...
+
+    @get("/node-plugins/shared-lists/by-name", response_class=GetSharedListResponseDto)
+    async def get_shared_list_by_name(
+        self,
+        name: Annotated[str, Query(description="Shared list name")],
+    ) -> GetSharedListResponseDto:
+        """Get Shared List by name (with its items)"""
+        ...
+
+    @post("/node-plugins/shared-lists", response_class=CreateSharedListResponseDto)
+    async def create_shared_list(
+        self,
+        body: Annotated[CreateSharedListRequestDto, PydanticBody()],
+    ) -> CreateSharedListResponseDto:
+        """Create Shared List"""
+        ...
+
+    @patch("/node-plugins/shared-lists", response_class=UpdateSharedListResponseDto)
+    async def update_shared_list(
+        self,
+        body: Annotated[UpdateSharedListRequestDto, PydanticBody()],
+    ) -> UpdateSharedListResponseDto:
+        """Update Shared List"""
+        ...
+
+    @delete("/node-plugins/shared-lists", response_class=None)
+    async def delete_shared_list_by_name(
+        self,
+        body: Annotated[DeleteSharedListRequestDto, PydanticBody()],
+    ) -> DeleteSharedListResponseDto:
+        """Delete Shared List by name (204 No Content)"""
+        ...
+
+    @post("/node-plugins/shared-lists/actions/sync", response_class=None)
+    async def sync_shared_list(
+        self,
+        body: Annotated[SyncSharedListRequestDto, PydanticBody()],
+    ) -> None:
+        """Push every plugin referencing this shared list to its nodes (202 Accepted)"""
         ...

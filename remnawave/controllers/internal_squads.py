@@ -18,6 +18,9 @@ from remnawave.models import (
     UpdateInternalSquadRequestDto,
     UpdateInternalSquadResponseDto,
     GetInternalSquadAccessibleNodesResponseDto,
+    GetInternalSquadsTagsResponseDto,
+    SetInternalSquadsTagsRequestDto,
+    SetInternalSquadsTagsResponseDto,
 )
 from remnawave.rapid import BaseController, delete, get, patch, post
 
@@ -135,4 +138,17 @@ class InternalSquadsController(BaseController):
         min_total_bytes: Annotated[Optional[int], Query(default=None, alias="minTotalBytes")] = None,
     ) -> GetInternalSquadUsageResponseDto:
         """Per-user traffic usage on the internal squad nodes."""
+        ...
+
+    @get("/internal-squads/tags", response_class=GetInternalSquadsTagsResponseDto)
+    async def get_internal_squads_tags(self) -> GetInternalSquadsTagsResponseDto:
+        """Get tags of Internal Squads"""
+        ...
+
+    @patch("/internal-squads/tags", response_class=SetInternalSquadsTagsResponseDto)
+    async def set_internal_squad_tags(
+        self,
+        body: Annotated[SetInternalSquadsTagsRequestDto, PydanticBody()],
+    ) -> SetInternalSquadsTagsResponseDto:
+        """Set tags of Internal Squad"""
         ...

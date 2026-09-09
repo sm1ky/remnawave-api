@@ -3,7 +3,9 @@ import pytest
 from remnawave.models import (
     CreateSnippetRequestDto,
     DeleteSnippetRequestDto,
+    CreateSnippetResponseDto,
     GetSnippetsResponseDto,
+    SyncSnippetRequestDto,
     UpdateSnippetRequestDto,
 )
 
@@ -75,3 +77,32 @@ async def test_snippet_name_validation(remnawave):
         
     with pytest.raises(ValueError):
         CreateSnippetRequestDto(name="", snippet=[])  # Empty name
+
+@pytest.mark.asyncio
+async def test_snippet_folder_name_and_sync(remnawave):
+    """Имена сниппетов поддерживают "папки" через "/", и их можно синхронизировать (v3.4.0)"""
+    folder_name = f"sdk tests/{random_string()}"
+
+    created = await remnawave.snippets.create_snippet(
+        CreateSnippetRequestDto(
+            name=folder_name,
+            snippet=[{"type": "vless", "encryption": "none"}],
+        )
+    )
+    assert isinstance(created, CreateSnippetResponseDto)
+
+    try:
+        snippets = await remnawave.snippets.get_snippets()
+        assert folder_name in [snippet.name for snippet in snippets.snippets]
+
+        synced = await remnawave.snippets.sync_snippet(
+            SyncSnippetRequestDto(name=folder_name)
+        )
+        assert synced is None
+    finally:
+        await remnawave.snippets.delete_snippet_by_name(
+            DeleteSnippetRequestDto(name=folder_name)
+        )
+
+    snippets_after = await remnawave.snippets.get_snippets()
+    assert folder_name not in [snippet.name for snippet in snippets_after.snippets]

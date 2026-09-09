@@ -51,14 +51,15 @@ class GetUserHwidDevicesResponseDto(BaseModel):
     total: float
     devices: List[HwidDeviceDto]
 
-class PlatformStatItem(BaseModel):
-    platform: str
-    count: float
-
-
 class AppStatItem(BaseModel):
     app: str
     count: float
+
+
+class PlatformStatItem(BaseModel):
+    platform: str
+    count: float
+    by_app: List[AppStatItem] = Field(default_factory=list, alias="byApp")
 
 
 class HwidStats(BaseModel):
