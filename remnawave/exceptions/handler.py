@@ -190,7 +190,7 @@ ERRORS: Dict[str, Type[ApiError]] = {
 
 # ---------------------------------------------------------------------------
 # Panel error codes, taken from the error DTOs of the Remnawave OpenAPI document
-# (openapi/remna-3-4-3.json).
+# (openapi/remnawave-3-4-4.json).
 #
 # Keyed by the raw code the panel sends rather than by ``ErrorCode`` member: a
 # number of members still carry values assigned by much older API versions, so
@@ -233,7 +233,7 @@ _SERVER_ERROR_CODES = (
     "A192", "A193", "A196", "A197", "A198", "A199", "A200", "A201", "A202", "A203", "A205",
     "A207", "A208", "A211", "A213", "A214", "A217", "A221", "A224", "A225", "A227", "A228",
     "A232", "A233", "A234", "A236", "A237", "A239", "A240", "A241", "A242", "A243", "A247",
-    "A248", "A249", "A250", "A251", "A254", "A256", "A257"
+    "A248", "A249", "A250", "A251", "A254", "A256", "A257", "A258"
 )
 
 for _codes, _exception in (

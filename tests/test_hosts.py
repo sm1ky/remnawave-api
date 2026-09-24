@@ -17,6 +17,8 @@ from remnawave.models import (
     UpdateHostRequestDto,
     UpdateHostResponseDto,
     GetAllHostTagsResponseDto,
+    CloneHostRequestDto,
+    CloneHostResponseDto,
     CreateInternalSquadRequestDto,
     HostInternalSquadsDto,
     HostMapperCopyOp,
@@ -417,3 +419,59 @@ class TestHostInternalSquadsAndMapper:
         assert updated is None
         fetched = await remnawave.hosts.get_one_host(uuid=str(host.uuid))
         assert fetched.internal_squads.squads == [internal_squad.uuid]
+
+
+class TestHostClone:
+    """Клонирование хоста (Remnawave API v3.4.4+)"""
+
+    @pytest.fixture
+    async def host(self, remnawave):
+        created = await remnawave.hosts.create_host(
+            CreateHostRequestDto(
+                inbound_uuid=REMNAWAVE_INBOUND_UUID,
+                config_profile_inbound_uuid=REMNAWAVE_CONFIG_PROFILE_UUID,
+                remark=generate_random_string(),
+                address=f"{random.randint(500, 800)}.0.0.1",
+                port=random.randint(5000, 8000),
+                tags=["CLONE_SRC"],
+            )
+        )
+        yield created
+        try:
+            await remnawave.hosts.delete_host(uuid=str(created.uuid))
+        except NotFoundError:
+            pass
+
+    @pytest.mark.asyncio
+    async def test_clone_host(self, remnawave, host):
+        """Клон получает новый uuid и копирует настройки источника"""
+        clone = await remnawave.hosts.clone_host(
+            CloneHostRequestDto(clone_from_uuid=host.uuid)
+        )
+
+        assert isinstance(clone, CloneHostResponseDto)
+        assert clone.uuid != host.uuid
+
+        try:
+            assert clone.address == host.address
+            assert clone.port == host.port
+            assert clone.tags == host.tags
+            assert clone.inbound.config_profile_inbound_uuid == (
+                host.inbound.config_profile_inbound_uuid
+            )
+
+            # клон реально существует в панели
+            fetched = await remnawave.hosts.get_one_host(uuid=str(clone.uuid))
+            assert fetched.uuid == clone.uuid
+        finally:
+            await remnawave.hosts.delete_host(uuid=str(clone.uuid))
+
+    @pytest.mark.asyncio
+    async def test_clone_unknown_host(self, remnawave):
+        """Клонирование несуществующего хоста отклоняется"""
+        with pytest.raises(ApiError):
+            await remnawave.hosts.clone_host(
+                CloneHostRequestDto(
+                    clone_from_uuid="00000000-0000-0000-0000-000000000000"
+                )
+            )

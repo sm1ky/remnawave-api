@@ -7,6 +7,7 @@ from remnawave.controllers.users import UsersController
 from remnawave.controllers.system import SystemController
 from remnawave.controllers.connections import ConnectionsController
 from remnawave.controllers.api_tokens_management import APITokensManagementController
+from remnawave.controllers.hosts import HostsController
 from remnawave.controllers.hosts_bulk_actions import HostsBulkActionsController
 from remnawave.controllers.bandwidthstats import BandWidthStatsController
 from remnawave.controllers.internal_squads import InternalSquadsController
@@ -257,3 +258,9 @@ class TestTagsEndpoints:
     def test_subscription_templates(self):
         assert hasattr(SubscriptionsTemplateController, "get_subscription_templates_tags")
         assert hasattr(SubscriptionsTemplateController, "set_subscription_template_tags")
+
+
+class TestHostsControllerEndpoints:
+    def test_has_clone_host(self):
+        # New in v3.4.4
+        assert hasattr(HostsController, "clone_host")

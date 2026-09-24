@@ -80,6 +80,8 @@ from .config_profiles import (
     UpdateConfigProfileResponseDto,
 )
 from .hosts import (
+    CloneHostRequestDto,
+    CloneHostResponseDto,
     CreateHostInboundData,
     HostInternalSquadsDto,
     HostMapperCopyOp,
@@ -1205,4 +1207,6 @@ __all__ = [
     "TorrentBlockerTopNodeDto",
     "TorrentBlockerTopUserDto",
     "TorrentBlockerUserDto",
+    "CloneHostRequestDto",
+    "CloneHostResponseDto",
 ]

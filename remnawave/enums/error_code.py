@@ -276,6 +276,7 @@ class ErrorCode(StrEnum):
     CREATE_SSH_TICKET_ERROR = "A254"  # Create SSH ticket error
     GET_TAGS_ERROR = "A256"  # Get tags error
     SET_TAGS_ERROR = "A257"  # Set tags error
+    CLONE_HOST_ERROR = "A258"  # Clone host error
 
     # Валидационные ошибки
     VALIDATION_ERROR = "V001"

@@ -382,6 +382,21 @@ class GetOneHostResponseDto(HostResponseDto):
     pass
 
 
+class CloneHostRequestDto(BaseModel):
+    """Request body for ``POST /api/hosts/actions/clone`` (Remnawave API v3.4.4+)."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    clone_from_uuid: UUID = Field(
+        alias="cloneFromUuid", description="UUID of the host to clone"
+    )
+
+
+class CloneHostResponseDto(HostResponseDto):
+    """Clone host response"""
+    pass
+
+
 class ReorderHostResponseDto(BaseModel):
     """Reorder hosts response"""
     is_updated: bool = Field(alias="isUpdated", default=True)

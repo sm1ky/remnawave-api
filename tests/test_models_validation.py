@@ -37,6 +37,7 @@ from remnawave.models import (
     NodeSystemStatsDto,
     NodeVersionsDto,
     # Hosts (v3.4.x)
+    CloneHostRequestDto,
     CreateHostInboundData,
     CreateHostRequestDto,
     HostInternalSquadsDto,
@@ -903,3 +904,20 @@ class TestContractDriftFixes:
         assert metric.active_handles == 30
         assert metric.instance_id == "0"
         assert metric.event_loop_p99_ms == 0.5
+
+
+class TestCloneHostRequestDto:
+    """POST /hosts/actions/clone, Remnawave API v3.4.4+."""
+
+    def test_serialization_alias(self):
+        source = uuid4()
+        dto = CloneHostRequestDto(clone_from_uuid=source)
+        assert dto.model_dump(by_alias=True, mode="json") == {"cloneFromUuid": str(source)}
+
+    def test_accepts_the_camel_case_name(self):
+        source = uuid4()
+        assert CloneHostRequestDto(cloneFromUuid=source).clone_from_uuid == source
+
+    def test_uuid_is_required(self):
+        with pytest.raises(ValidationError):
+            CloneHostRequestDto()

@@ -168,7 +168,7 @@ class TestNodeIpStatus:
 
 
 class TestErrorCodesV340:
-    """Error codes introduced by Remnawave API v3.4.0."""
+    """Error codes introduced by Remnawave API v3.4.x."""
 
     @pytest.mark.parametrize(
         "member, code",
@@ -191,6 +191,7 @@ class TestErrorCodesV340:
             ("CREATE_SSH_TICKET_ERROR", "A254"),
             ("GET_TAGS_ERROR", "A256"),
             ("SET_TAGS_ERROR", "A257"),
+            ("CLONE_HOST_ERROR", "A258"),
         ],
     )
     def test_code_value(self, member, code):

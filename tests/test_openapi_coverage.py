@@ -1,7 +1,7 @@
 """Route coverage of the bundled Remnawave OpenAPI spec.
 
 Offline test: it introspects the decorated controller methods and compares the
-resulting ``(METHOD, path)`` set against ``openapi/remna-3-4-3.json``.
+resulting ``(METHOD, path)`` set against ``openapi/remnawave-3-4-4.json``.
 """
 import inspect
 import json
@@ -15,7 +15,7 @@ from rapid_api_client.utils import find_annotation
 import remnawave.controllers as controllers
 from remnawave.rapid import BaseController
 
-SPEC_PATH = FsPath(__file__).resolve().parent.parent / "openapi" / "remna-3-4-3.json"
+SPEC_PATH = FsPath(__file__).resolve().parent.parent / "openapi" / "remnawave-3-4-4.json"
 HTTP_VERBS = {"GET", "POST", "PUT", "PATCH", "DELETE"}
 
 # openapi/ is not tracked by git, so these checks only run in a working copy that
@@ -66,9 +66,9 @@ def spec_routes() -> set[tuple[str, str]]:
     return _spec_routes()
 
 
-def test_spec_version_is_3_4_3():
+def test_spec_version_is_3_4_4():
     spec = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
-    assert spec["info"]["version"] == "3.4.3"
+    assert spec["info"]["version"] == "3.4.4"
 
 
 def test_every_spec_route_is_implemented(sdk_routes, spec_routes):

@@ -17,7 +17,7 @@ from remnawave.exceptions import (
 )
 from remnawave.exceptions.handler import ERRORS
 
-SPEC_PATH = Path(__file__).resolve().parent.parent / "openapi" / "remna-3-4-3.json"
+SPEC_PATH = Path(__file__).resolve().parent.parent / "openapi" / "remnawave-3-4-4.json"
 
 # openapi/ is not tracked by git, so these checks only run in a working copy that
 # has the spec next to the sources.
