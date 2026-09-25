@@ -60,6 +60,8 @@ class NodeConfigProfileDto(BaseModel):
 
 
 class NodeConfigProfileRequestDto(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     active_config_profile_uuid: UUID = Field(alias="activeConfigProfileUuid")
     active_inbounds: List[UUID] = Field(alias="activeInbounds")
 
@@ -330,12 +332,16 @@ class ResetNodeTrafficResponseDto(RestartEventResponse):
 
 class ConfigProfileData(BaseModel):
     """Config profile data for modification"""
+    model_config = ConfigDict(populate_by_name=True)
+
     active_config_profile_uuid: str = Field(alias="activeConfigProfileUuid")
     active_inbounds: List[str] = Field(alias="activeInbounds", min_length=1)
 
 
 class ProfileModificationRequestDto(BaseModel):
     """Request to modify profiles for multiple nodes"""
+    model_config = ConfigDict(populate_by_name=True)
+
     uuids: List[str] = Field(min_length=1)
     config_profile: ConfigProfileData = Field(alias="configProfile")
 

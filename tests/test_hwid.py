@@ -11,6 +11,7 @@ from remnawave.models import (
     DeleteUserHwidDeviceResponseDto,
     GetUserHwidDevicesResponseDto,
     GetHwidStatisticsResponseDto,
+    GetTopUsersByHwidDevicesResponseDto,
 )
 from tests.conftest import REMNAWAVE_USER_UUID
 
@@ -167,3 +168,21 @@ class TestHwidCRUD:
         # Проверяем, что устройства действительно удалены
         hwid_check = await remnawave.hwid.get_hwid_user(user_id=1)
         assert not any(device.hwid == random_hwid for device in hwid_check.devices)
+
+class TestHwidTopUsers:
+    @pytest.mark.asyncio
+    async def test_get_top_users_by_hwid_devices(self, remnawave):
+        response = await remnawave.hwid.get_top_users_by_hwid_devices()
+
+        assert isinstance(response, GetTopUsersByHwidDevicesResponseDto)
+        assert response.total >= len(response.users)
+        for user in response.users:
+            assert user.devices_count >= 1
+
+    @pytest.mark.asyncio
+    async def test_top_users_are_sorted_by_device_count(self, remnawave):
+        """Выдача отсортирована по убыванию числа устройств"""
+        response = await remnawave.hwid.get_top_users_by_hwid_devices()
+        counts = [u.devices_count for u in response.users]
+
+        assert counts == sorted(counts, reverse=True)

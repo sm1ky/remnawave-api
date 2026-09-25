@@ -1,13 +1,24 @@
+import re
+
 import pytest
 
+from remnawave.exceptions import ApiError
 from remnawave.models import (
+    DebugSrrMatcherRequestDto,
+    DebugSrrMatcherResponseDto,
     GetBandwidthStatsResponseDto,
+    GetHttpStatsResponseDto,
+    GetMetadataResponseDto,
     GetNodesStatisticsResponseDto,
+    GetRecapResponseDto,
+    GetStatsDigestResponseDto,
     GetStatsResponseDto,
     GetNodesMetricsResponseDto,
     GetRemnawaveHealthResponseDto,
     GetConfigurationResponseDto,
+    GetX25519KeyPairResponseDto,
 )
+from tests.utils import generate_utc_isoformat_range
 
 
 class TestSystemStatistics:
@@ -87,3 +98,117 @@ class TestSystemConfiguration:
         assert isinstance(config.misc.short_uuid_length, (int, float))
         assert isinstance(config.misc.sub_public_domain, str)
         assert isinstance(config.misc.user_usage_ignore_below_bytes, (int, float))
+
+
+class TestSystemMetadata:
+    """Информация о панели и сборке"""
+
+    @pytest.mark.asyncio
+    async def test_get_metadata(self, remnawave):
+        response = await remnawave.system.get_metadata()
+
+        assert isinstance(response, GetMetadataResponseDto)
+        # версия панели — непустой semver-подобный идентификатор
+        assert response.version
+        assert re.match(r"^\d+\.\d+", response.version), response.version
+        assert response.build is not None
+        assert response.build.number
+
+    @pytest.mark.asyncio
+    async def test_metadata_matches_spec_version(self, remnawave):
+        """Панель в окружении должна соответствовать контракту, под который собран SDK"""
+        response = await remnawave.system.get_metadata()
+        major_minor = ".".join(response.version.split(".")[:2])
+        assert major_minor == "3.4", (
+            f"SDK собран под контракт 3.4.x, панель отвечает {response.version}"
+        )
+
+
+class TestSystemRecap:
+    @pytest.mark.asyncio
+    async def test_get_recap(self, remnawave):
+        response = await remnawave.system.get_recap()
+
+        assert isinstance(response, GetRecapResponseDto)
+        assert response.this_month.users >= 0
+        assert response.total.users >= response.this_month.users
+        assert response.total.nodes >= 0
+        assert response.this_month.traffic
+        assert response.total.traffic
+
+    @pytest.mark.asyncio
+    async def test_recap_user_total_matches_users_endpoint(self, remnawave):
+        """Сводка считает тех же пользователей, что отдаёт /users"""
+        recap = await remnawave.system.get_recap()
+        users = await remnawave.users.get_all_users(size=1)
+
+        assert recap.total.users == users.total
+
+
+class TestSystemStatsDigest:
+    @pytest.mark.asyncio
+    async def test_get_stats_digest(self, remnawave):
+        start, end = generate_utc_isoformat_range()
+        response = await remnawave.system.get_stats_digest(start=start, end=end)
+
+        assert isinstance(response, GetStatsDigestResponseDto)
+
+    @pytest.mark.asyncio
+    async def test_inverted_range_is_rejected(self, remnawave):
+        """start позже end — панель отвечает ошибкой, а не пустым отчётом"""
+        start, end = generate_utc_isoformat_range()
+        with pytest.raises(ApiError):
+            await remnawave.system.get_stats_digest(start=end, end=start)
+
+
+class TestSystemHttpStats:
+    @pytest.mark.asyncio
+    async def test_get_http_stats(self, remnawave):
+        response = await remnawave.system.get_http_stats()
+
+        assert isinstance(response, GetHttpStatsResponseDto)
+        assert response.total >= 0
+        assert isinstance(response.routes, list)
+
+    @pytest.mark.asyncio
+    async def test_counters_grow_after_a_request(self, remnawave):
+        """Счётчик запросов растёт — значит цифры живые, а не заглушка"""
+        before = await remnawave.system.get_http_stats()
+        await remnawave.system.get_stats()
+        after = await remnawave.system.get_http_stats()
+
+        assert after.total >= before.total
+
+
+class TestSystemTools:
+    @pytest.mark.asyncio
+    async def test_get_x25519_key_pair(self, remnawave):
+        response = await remnawave.system.get_x25519_key_pair()
+
+        assert isinstance(response, GetX25519KeyPairResponseDto)
+        assert response.key_pairs
+
+    @pytest.mark.asyncio
+    async def test_key_pairs_differ_between_calls(self, remnawave):
+        """Ключи генерируются, а не отдаются из кэша"""
+        first = await remnawave.system.get_x25519_key_pair()
+        second = await remnawave.system.get_x25519_key_pair()
+
+        assert first.key_pairs != second.key_pairs
+
+
+class TestSrrMatcher:
+    """Тестер SRR-правил"""
+
+    @pytest.mark.asyncio
+    async def test_debug_srr_matcher_with_live_rules(self, remnawave):
+        """Правила из настроек подписки прогоняются через тестер без ошибок"""
+        settings = await remnawave.subscriptions_settings.get_settings()
+        if settings.response_rules is None:
+            pytest.skip("В настройках подписки не заданы response rules")
+
+        response = await remnawave.system.debug_srr_matcher(
+            DebugSrrMatcherRequestDto(response_rules=settings.response_rules)
+        )
+
+        assert isinstance(response, DebugSrrMatcherResponseDto)

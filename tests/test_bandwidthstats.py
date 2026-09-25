@@ -1,11 +1,20 @@
 import pytest
 
+from pydantic import ValidationError
+
+from remnawave.exceptions import ApiError
 from remnawave.models import (
     # Legacy models (deprecated)
     GetNodesUsageByRangeResponseDto,
 
     # New stats models
+    FetchNodesUsageBodyDto,
+    FetchNodesUsageResponseDto,
+    GetInternalSquadUsageResponseDto,
+    GetInternalSquadUserUsageResponseDto,
     GetStatsNodesUsageResponseDto,
+    GetStatsNodesUsersUsageRequestDto,
+    GetStatsNodesUsersUsageResponseDto,
     GetStatsNodeUsersUsageResponseDto,
     GetStatsUserUsageResponseDto,
 )
@@ -118,3 +127,95 @@ async def test_bandwidth_data_structure(remnawave):
     if stats.response.series:
         for series_item in stats.response.series:
             assert len(series_item.data) == len(stats.response.categories)
+
+@pytest.fixture
+async def node_uuids(remnawave):
+    nodes = await remnawave.nodes.get_all_nodes()
+    if not len(nodes):
+        pytest.skip("В окружении нет ни одной ноды")
+    return [n.uuid for n in nodes]
+
+
+class TestNodesUsersUsage:
+    @pytest.mark.asyncio
+    async def test_get_stats_nodes_users_usage(self, remnawave, node_uuids):
+        start, end = generate_date_range()
+
+        response = await remnawave.bandwidthstats.get_stats_nodes_users_usage(
+            body=GetStatsNodesUsersUsageRequestDto(nodes_uuids=node_uuids),
+            start=start,
+            end=end,
+        )
+
+        assert isinstance(response, GetStatsNodesUsersUsageResponseDto)
+
+    def test_empty_node_list_is_rejected_client_side(self):
+        """Пустой список нод отсекается моделью, запрос до панели не доходит"""
+        with pytest.raises(ValidationError):
+            GetStatsNodesUsersUsageRequestDto(nodes_uuids=[])
+
+
+class TestFetchNodesUsage:
+    @pytest.mark.asyncio
+    async def test_fetch_nodes_usage(self, remnawave, node_uuids):
+        start, end = generate_date_range()
+
+        response = await remnawave.bandwidthstats.fetch_nodes_usage(
+            body=FetchNodesUsageBodyDto(nodes_uuids=node_uuids),
+            start=start,
+            end=end,
+        )
+
+        assert isinstance(response, FetchNodesUsageResponseDto)
+
+    @pytest.mark.asyncio
+    async def test_min_total_bytes_filter(self, remnawave, node_uuids):
+        """Недостижимый порог трафика отсекает всех пользователей"""
+        start, end = generate_date_range()
+
+        response = await remnawave.bandwidthstats.fetch_nodes_usage(
+            body=FetchNodesUsageBodyDto(nodes_uuids=node_uuids),
+            start=start,
+            end=end,
+            min_total_bytes=10**18,
+        )
+
+        assert not (response.nodes or [])
+
+
+class TestInternalSquadUsageStats:
+    @pytest.fixture
+    async def squad(self, remnawave):
+        squads = await remnawave.internal_squads.get_internal_squads()
+        if not squads.internal_squads:
+            pytest.skip("В окружении нет внутренних сквадов")
+        return squads.internal_squads[0]
+
+    @pytest.mark.asyncio
+    async def test_squad_usage(self, remnawave, squad):
+        start, end = generate_date_range()
+
+        response = await remnawave.bandwidthstats.get_internal_squad_usage(
+            str(squad.uuid), start=start, end=end
+        )
+
+        assert isinstance(response, GetInternalSquadUsageResponseDto)
+        assert response.squad_uuid == squad.uuid
+
+    @pytest.mark.asyncio
+    async def test_squad_user_usage(self, remnawave, squad):
+        """Посуточная разбивка по конкретному пользователю сквада"""
+        start, end = generate_date_range()
+        users = await remnawave.users.get_all_users(size=1)
+        if not users.users:
+            pytest.skip("В окружении нет ни одного пользователя")
+
+        response = await remnawave.bandwidthstats.get_internal_squad_user_usage(
+            squad_uuid=str(squad.uuid),
+            user_id=users.users[0].id,
+            start=start,
+            end=end,
+        )
+
+        assert isinstance(response, GetInternalSquadUserUsageResponseDto)
+        assert isinstance(response.days or [], list)

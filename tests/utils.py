@@ -1,6 +1,6 @@
 import random
 import string
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Tuple
 
 
@@ -28,3 +28,12 @@ def generate_date_range() -> tuple[str, str]:
     end = datetime.now()
     start = end - timedelta(days=7)
     return start.strftime('%Y-%m-%d'), end.strftime('%Y-%m-%d')
+
+def generate_utc_isoformat_range() -> Tuple[str, str]:
+    """Timezone-aware ISO range: endpoints such as /system/stats/digest reject a naive datetime."""
+    end = datetime.now(timezone.utc)
+    start = end - timedelta(days=7)
+    return (
+        start.isoformat(timespec="seconds"),
+        end.isoformat(timespec="seconds"),
+    )

@@ -133,6 +133,8 @@ class InternalSquadsController(BaseController):
     async def get_internal_squad_usage(
         self,
         uuid: Annotated[str, Path(description="UUID of the internal squad")],
+        start: Annotated[str, Query(description="Start date (YYYY-MM-DD)")],
+        end: Annotated[str, Query(description="End date (YYYY-MM-DD)")],
         limit: Annotated[Optional[int], Query(default=None, description="Page size (default 250)")] = None,
         cursor: Annotated[Optional[int], Query(default=None, description="Keyset cursor")] = None,
         min_total_bytes: Annotated[Optional[int], Query(default=None, alias="minTotalBytes")] = None,

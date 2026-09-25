@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from remnawave.enums import ResponseType
 from remnawave.models.subscriptions_settings import ResponseRule, ResponseRules
@@ -216,6 +216,14 @@ class DebugSrrMatcherData(BaseModel):
     matched_rule: Optional[ResponseRule] = Field(alias="matchedRule")
     input_headers: Dict[str, str] = Field(alias="inputHeaders")
     output_headers: Dict[str, str] = Field(alias="outputHeaders")
+
+    @field_validator("input_headers", "output_headers", mode="before")
+    @classmethod
+    def _empty_list_is_an_empty_mapping(cls, value: Any) -> Any:
+        """The panel serialises an empty header map as `[]` instead of `{}`."""
+        if isinstance(value, list) and not value:
+            return {}
+        return value
 
 
 class DebugSrrMatcherResponseDto(DebugSrrMatcherData):

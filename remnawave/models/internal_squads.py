@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated, List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 from remnawave.models.tags import GetTagsResponseDto, SetTagsRequestDto, SetTagsResponseDto
 
@@ -71,6 +71,8 @@ class DeleteInternalSquadResponseDto(BaseModel):
 
 
 class AddUsersToInternalSquadRequestDto(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     user_uuids: List[UUID] = Field(alias="userUuids")
 
 
@@ -83,6 +85,8 @@ class AddUsersToInternalSquadResponseDto(BulkActionsResponseDto):
 
 
 class DeleteUsersFromInternalSquadRequestDto(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     user_uuids: List[UUID] = Field(alias="userUuids")
 
 
@@ -96,8 +100,10 @@ class AccessibleNodeDto(BaseModel):
     country_code: Optional[str] = Field(default=None, alias="countryCode")
     config_profile_uuid: Optional[UUID] = Field(default=None, alias="configProfileUuid")
     config_profile_name: Optional[str] = Field(default=None, alias="configProfileName")
-    active_inbounds: List[Optional[UUID]] = Field(
-        default_factory=list, alias="activeInbounds"
+    active_inbounds: List[str] = Field(
+        default_factory=list,
+        alias="activeInbounds",
+        description="Inbound tags, not UUIDs — this is what the panel returns here.",
     )
 
 

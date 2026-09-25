@@ -1,6 +1,7 @@
 import pytest
 
 from remnawave.models import (
+    GetStatusResponseDto,
     LoginRequestDto, 
     LoginResponseDto, 
     LoginTelegramRequestDto,
@@ -41,3 +42,21 @@ class TestAuthentication:
             pytest.fail("Expected authentication error for invalid credentials")
         except ApiError as e:
             assert e.status_code in [401, 403], f"Expected 401 or 403, got {e.status_code}"
+
+class TestAuthStatus:
+    """Публичный статус аутентификации панели"""
+
+    @pytest.mark.asyncio
+    async def test_get_status(self, remnawave):
+        response = await remnawave.auth.get_status()
+
+        assert isinstance(response, GetStatusResponseDto)
+        assert isinstance(response.is_login_allowed, bool)
+        assert isinstance(response.is_register_allowed, bool)
+
+    @pytest.mark.asyncio
+    async def test_register_is_closed_on_a_configured_panel(self, remnawave):
+        """На панели с заведённым админом регистрация закрыта"""
+        response = await remnawave.auth.get_status()
+
+        assert response.is_register_allowed is False

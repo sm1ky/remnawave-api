@@ -9,7 +9,7 @@ import re
 from pathlib import Path as FsPath
 
 import pytest
-from rapid_api_client.annotations import Path as PathParam
+from rapid_api_client.annotations import Path as PathParam, Query as QueryParam
 from rapid_api_client.utils import find_annotation
 
 import remnawave.controllers as controllers
@@ -115,3 +115,89 @@ def test_every_path_placeholder_is_bound(sdk_routes):
                     f"{sorted(placeholders - bound)}"
                 )
     assert not unbound, "Path placeholders without a Path() annotation: " + "; ".join(unbound)
+
+
+def _decorated_routes():
+    """Yield (controller, method, verb, path, signature) for every decorated endpoint."""
+    for controller_name, controller in inspect.getmembers(controllers, inspect.isclass):
+        if not issubclass(controller, BaseController) or controller is BaseController:
+            continue
+        for method_name, func in inspect.getmembers(controller, inspect.isfunction):
+            wrapped = getattr(func, "__wrapped__", None)
+            closure = func.__closure__ or (wrapped and wrapped.__closure__)
+            if not closure:
+                continue
+            cells = [cell.cell_contents for cell in closure]
+            verb = next((c for c in cells if isinstance(c, str) and c in HTTP_VERBS), None)
+            path = next((c for c in cells if isinstance(c, str) and c.startswith("/")), None)
+            if verb and path:
+                yield (
+                    controller_name,
+                    method_name,
+                    verb,
+                    "/api" + path,
+                    inspect.signature(wrapped or func),
+                )
+
+
+def test_every_required_query_param_is_exposed():
+    """A required query param with no SDK argument makes the endpoint answer 400 every time."""
+    spec = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
+    missing = []
+    for controller_name, method_name, verb, path, signature in _decorated_routes():
+        operation = spec["paths"].get(path, {}).get(verb.lower())
+        if not operation:
+            continue
+        required = {
+            p["name"]
+            for p in operation.get("parameters", [])
+            if p["in"] == "query" and p.get("required")
+        }
+        if not required:
+            continue
+        exposed = set()
+        for parameter in signature.parameters.values():
+            annotation = find_annotation(parameter, QueryParam)
+            if annotation is not None:
+                exposed.add(getattr(annotation, "alias", None) or parameter.name)
+        if required - exposed:
+            missing.append(
+                f"{controller_name}.{method_name} ({verb} {path}): {sorted(required - exposed)}"
+            )
+    assert not missing, "Required query params with no SDK argument: " + "; ".join(missing)
+
+
+def test_a_body_with_required_fields_is_never_optional():
+    """`body=None` on a payload the panel validates means the call always answers 400.
+
+    A required body whose schema has no required property of its own is fine: the panel
+    accepts those calls without a payload (revoke-subscription, for one).
+    """
+    spec = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
+    schemas = spec["components"]["schemas"]
+
+    def resolve(schema, depth=0):
+        while isinstance(schema, dict) and "$ref" in schema and depth < 20:
+            schema = schemas[schema["$ref"].split("/")[-1]]
+            depth += 1
+        return schema
+
+    offenders = []
+    for controller_name, method_name, verb, path, signature in _decorated_routes():
+        operation = spec["paths"].get(path, {}).get(verb.lower())
+        if not operation:
+            continue
+        body = operation.get("requestBody")
+        if not body or not body.get("required"):
+            continue
+        schema = resolve(body.get("content", {}).get("application/json", {}).get("schema", {}))
+        if not schema.get("required"):
+            continue
+        parameter = signature.parameters.get("body")
+        if parameter is not None and parameter.default is None:
+            offenders.append(
+                f"{controller_name}.{method_name} ({verb} {path}) needs {schema['required']}"
+            )
+    assert not offenders, "Request body defaults to None despite required fields: " + "; ".join(
+        offenders
+    )

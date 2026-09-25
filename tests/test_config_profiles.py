@@ -149,3 +149,21 @@ async def test_config_profiles(remnawave) -> None:
     # Test delete config profile
     delete_profile = await remnawave.config_profiles.delete_config_profile_by_uuid(profile_uuid)
     assert delete_profile is None
+
+
+@pytest.mark.asyncio
+async def test_computed_config_profile(remnawave) -> None:
+    """Вычисленный профиль отдаётся по тому же uuid и содержит развёрнутый конфиг"""
+    profiles = await remnawave.config_profiles.get_config_profiles()
+    profile = profiles.config_profiles[0]
+
+    computed = await remnawave.config_profiles.get_computed_config_profile_by_uuid(
+        str(profile.uuid)
+    )
+
+    assert isinstance(computed, GetConfigProfileByUuidResponseDto)
+    assert computed.uuid == profile.uuid
+    assert computed.name == profile.name
+    assert computed.config
+    # инбаунды вычисленного профиля совпадают с исходными
+    assert {i.uuid for i in computed.inbounds} == {i.uuid for i in profile.inbounds}

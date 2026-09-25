@@ -3,7 +3,7 @@ from enum import StrEnum
 from typing import Dict, List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from remnawave.models import CustomRemarksDto, HwidSettingsDto
 from remnawave.models.tags import GetTagsResponseDto, SetTagsRequestDto, SetTagsResponseDto
 
@@ -25,12 +25,16 @@ class ExternalSquadInfoDto(BaseModel):
 
 class ExternalSquadTemplateDto(BaseModel):
     """External squad template"""
+    model_config = ConfigDict(populate_by_name=True)
+
     template_uuid: UUID = Field(alias="templateUuid")
     template_type: TemplateType = Field(alias="templateType")
 
 
 class ExternalSquadSubscriptionSettingsDto(BaseModel):
     """External squad subscription settings"""
+    model_config = ConfigDict(populate_by_name=True)
+
     profile_title: Optional[str] = Field(None, alias="profileTitle")
     support_link: Optional[str] = Field(None, alias="supportLink")
     profile_update_interval: Optional[int] = Field(None, alias="profileUpdateInterval", ge=1)
@@ -43,6 +47,8 @@ class ExternalSquadSubscriptionSettingsDto(BaseModel):
 
 class ExternalSquadHostOverridesDto(BaseModel):
     """External squad host overrides"""
+    model_config = ConfigDict(populate_by_name=True)
+
     server_description: Optional[str] = Field(None, alias="serverDescription", max_length=30)
     vless_route_id: Optional[int] = Field(None, alias="vlessRouteId", ge=0, le=65535)
 
@@ -90,6 +96,8 @@ class CreateExternalSquadResponseDto(ExternalSquadDto):
 
 class UpdateExternalSquadRequestDto(BaseModel):
     """Request to update external squad"""
+    model_config = ConfigDict(populate_by_name=True)
+
     uuid: UUID
     name: Optional[str] = Field(None, min_length=2, max_length=30, pattern=r"^[A-Za-z0-9_\s-]+$")
     templates: Optional[List[ExternalSquadTemplateDto]] = None

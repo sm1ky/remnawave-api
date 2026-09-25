@@ -10,6 +10,9 @@ from remnawave.models import (
     CreateUserBodyDto,
     ExtendUserBodyDto,
     GetUserAccessibleNodesResponseDto,
+    GetUsersStreamResponseDto,
+    ResolveUserBodyDto,
+    ResolveUserResponseDto,
     UpdateUserBodyDto,
     UserResponseDto,
     UsersResponseDto,
@@ -203,3 +206,84 @@ async def test_user(remnawave):
     yield user
 
     await remnawave.users.delete_user(user_id=user.id)
+
+
+class TestResolveUser:
+    """Поиск пользователя по любому из уникальных полей"""
+
+    @pytest.mark.asyncio
+    async def test_resolve_by_username(self, remnawave, test_user):
+        response = await remnawave.users.resolve_user(
+            ResolveUserBodyDto(username=test_user.username)
+        )
+
+        assert isinstance(response, ResolveUserResponseDto)
+        assert response.username == test_user.username
+        assert response.id == test_user.id
+        assert response.short_uuid == test_user.short_uuid
+
+    @pytest.mark.asyncio
+    async def test_resolve_by_short_uuid(self, remnawave, test_user):
+        response = await remnawave.users.resolve_user(
+            ResolveUserBodyDto(short_uuid=test_user.short_uuid)
+        )
+
+        assert response.id == test_user.id
+
+    @pytest.mark.asyncio
+    async def test_resolve_by_id(self, remnawave, test_user):
+        response = await remnawave.users.resolve_user(ResolveUserBodyDto(id=test_user.id))
+
+        assert response.username == test_user.username
+
+    @pytest.mark.asyncio
+    async def test_all_three_lookups_agree(self, remnawave, test_user):
+        by_name = await remnawave.users.resolve_user(
+            ResolveUserBodyDto(username=test_user.username)
+        )
+        by_id = await remnawave.users.resolve_user(ResolveUserBodyDto(id=test_user.id))
+        by_short = await remnawave.users.resolve_user(
+            ResolveUserBodyDto(short_uuid=test_user.short_uuid)
+        )
+
+        assert by_name.model_dump() == by_id.model_dump() == by_short.model_dump()
+
+    @pytest.mark.asyncio
+    async def test_unknown_username(self, remnawave):
+        with pytest.raises(ApiError):
+            await remnawave.users.resolve_user(
+                ResolveUserBodyDto(username="sdk_no_such_user_zzz")
+            )
+
+
+class TestUsersStream:
+    """Курсорная выдача пользователей"""
+
+    @pytest.mark.asyncio
+    async def test_first_page(self, remnawave):
+        response = await remnawave.users.get_users_stream(size=2)
+
+        assert isinstance(response, GetUsersStreamResponseDto)
+        assert len(response.users) <= 2
+
+    @pytest.mark.asyncio
+    async def test_cursor_advances(self, remnawave):
+        """Вторая страница не повторяет первую"""
+        first = await remnawave.users.get_users_stream(size=2)
+        if not first.has_more:
+            pytest.skip("В окружении слишком мало пользователей для второй страницы")
+
+        second = await remnawave.users.get_users_stream(size=2, cursor=first.next_cursor)
+
+        first_ids = {u.id for u in first.users}
+        second_ids = {u.id for u in second.users}
+        assert first_ids
+        assert not (first_ids & second_ids)
+
+    @pytest.mark.asyncio
+    async def test_status_filter(self, remnawave):
+        """Фильтр по статусу действительно фильтрует"""
+        response = await remnawave.users.get_users_stream(size=10, status=UserStatus.ACTIVE)
+
+        for user in response.users:
+            assert user.status == UserStatus.ACTIVE

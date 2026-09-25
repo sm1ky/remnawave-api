@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
 
 import pytest
+import pytz
 
+from remnawave.exceptions import ApiError, NotFoundError
 from remnawave.models import (
     CreateInfraBillingHistoryRecordRequestDto,
     CreateInfraBillingHistoryRecordResponseDto,
@@ -44,7 +46,20 @@ async def test_infra_billing_providers(remnawave) -> None:
     assert create_provider.login_url == "https://example.com/login"
     
     provider_uuid = str(create_provider.uuid)
-    
+
+    try:
+        await _exercise_provider(remnawave, create_provider, provider_name)
+    finally:
+        # провайдер удаляется даже если проверка выше упала, иначе он копится на панели
+        delete_provider = await remnawave.infra_billing.delete_infra_provider_by_uuid(
+            provider_uuid
+        )
+        assert delete_provider is None
+
+
+async def _exercise_provider(remnawave, create_provider, provider_name) -> None:
+    provider_uuid = str(create_provider.uuid)
+
     # Test get all infra providers
     all_providers = await remnawave.infra_billing.get_infra_providers()
     assert isinstance(all_providers, GetInfraProvidersResponseDto)
@@ -76,10 +91,6 @@ async def test_infra_billing_providers(remnawave) -> None:
     assert update_provider.name == updated_name
     assert update_provider.favicon_link == "https://example.com/new-favicon.ico"
     assert update_provider.login_url == "https://example.com/new-login"
-    
-    # Test delete infra provider
-    delete_provider = await remnawave.infra_billing.delete_infra_provider_by_uuid(provider_uuid)
-    assert delete_provider is None
 
 
 @pytest.mark.asyncio
@@ -209,3 +220,90 @@ async def test_infra_billing_complete_workflow(remnawave) -> None:
     finally:
         # 5. Cleanup provider
         delete_provider = await remnawave.infra_billing.delete_infra_provider_by_uuid(provider_uuid)
+
+@pytest.fixture
+async def provider(remnawave):
+    created = await remnawave.infra_billing.create_infra_provider(
+        CreateInfraProviderRequestDto(name=f"prov_{generate_random_string(length=6)}")
+    )
+    yield created
+    try:
+        await remnawave.infra_billing.delete_infra_provider_by_uuid(str(created.uuid))
+    except NotFoundError:
+        pass
+
+
+class TestInfraBillingHistoryRecords:
+    @pytest.mark.asyncio
+    async def test_create_and_delete_record(self, remnawave, provider):
+        """Запись биллинга появляется в истории и удаляется по uuid"""
+        billed_at = datetime.now(tz=pytz.utc)
+        before = await remnawave.infra_billing.get_infra_billing_history_records()
+
+        created = await remnawave.infra_billing.create_infra_billing_history_record(
+            CreateInfraBillingHistoryRecordRequestDto(
+                provider_uuid=provider.uuid, amount=42.5, billed_at=billed_at
+            )
+        )
+
+        assert created.total == before.total + 1
+        record = next(r for r in created.records if r.provider_uuid == provider.uuid)
+        assert record.amount == 42.5
+
+        await remnawave.infra_billing.delete_infra_billing_history_record_by_uuid(
+            str(record.uuid)
+        )
+
+        after = await remnawave.infra_billing.get_infra_billing_history_records()
+        assert after.total == before.total
+        assert str(record.uuid) not in [str(r.uuid) for r in after.records]
+
+    @pytest.mark.asyncio
+    async def test_record_requires_a_known_provider(self, remnawave):
+        with pytest.raises(ApiError):
+            await remnawave.infra_billing.create_infra_billing_history_record(
+                CreateInfraBillingHistoryRecordRequestDto(
+                    provider_uuid="00000000-0000-0000-0000-000000000000",
+                    amount=1,
+                    billed_at=datetime.now(tz=pytz.utc),
+                )
+            )
+
+
+class TestInfraBillingNodeUpdate:
+    @pytest.mark.asyncio
+    async def test_update_next_billing_date(self, remnawave, provider):
+        """Дата следующего платежа переносится у привязанной ноды"""
+        nodes = await remnawave.nodes.get_all_nodes()
+        if not len(nodes):
+            pytest.skip("В окружении нет ни одной ноды")
+
+        next_billing_at = datetime.now(tz=pytz.utc) + timedelta(days=30)
+        created = await remnawave.infra_billing.create_infra_billing_node(
+            CreateInfraBillingNodeRequestDto(
+                provider_uuid=provider.uuid,
+                node_uuid=nodes[0].uuid,
+                name=f"bn_{generate_random_string(length=6)}",
+                next_billing_at=next_billing_at,
+            )
+        )
+        billing_node = next(
+            n for n in created.billing_nodes if n.provider_uuid == provider.uuid
+        )
+
+        try:
+            moved_to = datetime.now(tz=pytz.utc) + timedelta(days=60)
+            updated = await remnawave.infra_billing.update_infra_billing_node(
+                UpdateInfraBillingNodeRequestDto(
+                    uuids=[billing_node.uuid], next_billing_at=moved_to
+                )
+            )
+
+            refreshed = next(
+                n for n in updated.billing_nodes if n.uuid == billing_node.uuid
+            )
+            assert refreshed.next_billing_at.date() == moved_to.date()
+        finally:
+            await remnawave.infra_billing.delete_infra_billing_node_by_uuid(
+                str(billing_node.uuid)
+            )

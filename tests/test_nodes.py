@@ -8,9 +8,13 @@ from remnawave.models import (
     BulkNodesUpdateFieldsDto,
     BulkNodesUpdateRequestDto,
     CreateNodeIntegrationRequestDto,
+    ConfigProfileData,
+    GetAllNodesTagsResponseDto,
     NodeConfigProfileRequestDto,
+    NodesBulkActionsRequestDto,
     CreateNodeRequestDto,
     NodeIpDto,
+    ProfileModificationRequestDto,
     DeleteNodeResponseDto,
     GetAllNodesResponseDto,
     NodeResponseDto,
@@ -208,3 +212,96 @@ class TestNodeIpsAndIntegrations:
 
         fetched = await remnawave.nodes.get_one_node(uuid=str(node.uuid))
         assert fetched.integration_uuids == [node_integration.uuid]
+
+
+class TestNodeTags:
+    @pytest.mark.asyncio
+    async def test_get_all_nodes_tags(self, remnawave):
+        response = await remnawave.nodes.get_all_nodes_tags()
+
+        assert isinstance(response, GetAllNodesTagsResponseDto)
+        assert isinstance(response.tags, list)
+
+    @pytest.mark.asyncio
+    async def test_tags_cover_every_tag_in_use(self, remnawave):
+        """Каталог тегов содержит все теги, реально проставленные на нодах"""
+        catalog = set((await remnawave.nodes.get_all_nodes_tags()).tags)
+        in_use = {tag for node in await remnawave.nodes.get_all_nodes() for tag in node.tags}
+
+        assert in_use <= catalog
+
+
+class TestNodeLifecycleActions:
+    """enable / disable / restart на собственной тестовой ноде"""
+
+    @pytest.fixture
+    async def node(self, remnawave):
+        created = await remnawave.nodes.create_node(
+            CreateNodeRequestDto(
+                name=generate_random_string(),
+                address=f"{random.randint(500, 800)}.0.0.1",
+                port=random.randint(5000, 8000),
+                config_profile=NodeConfigProfileRequestDto.model_validate(
+                    {
+                        "activeConfigProfileUuid": str(REMNAWAVE_CONFIG_PROFILE_UUID),
+                        "activeInbounds": [str(REMNAWAVE_INBOUND_UUID)],
+                    }
+                ),
+            )
+        )
+        yield created
+        try:
+            await remnawave.nodes.delete_node(uuid=str(created.uuid))
+        except NotFoundError:
+            pass
+
+    @pytest.mark.asyncio
+    async def test_disable_then_enable(self, remnawave, node):
+        assert node.is_disabled is False
+
+        disabled = await remnawave.nodes.disable_node(uuid=str(node.uuid))
+        assert disabled.is_disabled is True
+        assert (await remnawave.nodes.get_one_node(uuid=str(node.uuid))).is_disabled is True
+
+        enabled = await remnawave.nodes.enable_node(uuid=str(node.uuid))
+        assert enabled.is_disabled is False
+        assert (await remnawave.nodes.get_one_node(uuid=str(node.uuid))).is_disabled is False
+
+    @pytest.mark.asyncio
+    async def test_restart_node(self, remnawave, node):
+        """Рестарт отключённой ноды принимается панелью как событие"""
+        response = await remnawave.nodes.restart_node(uuid=str(node.uuid))
+
+        assert response is None or getattr(response, "event_sent", True)
+
+    @pytest.mark.asyncio
+    async def test_bulk_action_disables_only_the_listed_node(self, remnawave, node):
+        """Массовое действие ограничено переданными uuid"""
+        others = [n for n in await remnawave.nodes.get_all_nodes() if n.uuid != node.uuid]
+        before = {n.uuid: n.is_disabled for n in others}
+
+        await remnawave.nodes.nodes_bulk_actions(
+            NodesBulkActionsRequestDto(uuids=[node.uuid], action="DISABLE")
+        )
+
+        assert (await remnawave.nodes.get_one_node(uuid=str(node.uuid))).is_disabled is True
+        after = {n.uuid: n.is_disabled for n in await remnawave.nodes.get_all_nodes() if n.uuid != node.uuid}
+        assert after == before
+
+    @pytest.mark.asyncio
+    async def test_profile_modification(self, remnawave, node):
+        """Смена профиля для списка нод применяется к ноде"""
+        await remnawave.nodes.profile_modification(
+            ProfileModificationRequestDto(
+                uuids=[str(node.uuid)],
+                config_profile=ConfigProfileData(
+                    active_config_profile_uuid=str(REMNAWAVE_CONFIG_PROFILE_UUID),
+                    active_inbounds=[str(REMNAWAVE_INBOUND_UUID)],
+                ),
+            )
+        )
+
+        fetched = await remnawave.nodes.get_one_node(uuid=str(node.uuid))
+        assert str(fetched.config_profile.active_config_profile_uuid) == str(
+            REMNAWAVE_CONFIG_PROFILE_UUID
+        )

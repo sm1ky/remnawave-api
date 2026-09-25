@@ -28,6 +28,10 @@ from .auth import (
     GetPasskeyAuthenticationOptionsResponseDto,
 )
 from .bandwidthstats import (
+    FetchNodesUsageBodyDto,
+    FetchNodesUsageResponseDto,
+    GetInternalSquadUsageResponseDto,
+    GetInternalSquadUserUsageResponseDto,
     GetNodeUserUsageByRangeResponseDto,
     GetNodesRealtimeUsageResponseDto,
     GetNodesUsageByRangeResponseDto,
@@ -201,6 +205,7 @@ from .internal_squads import (
 )
 from .keygen import GetNodeSecretKeyResponseDto
 from .nodes import (
+    ConfigProfileData,
     CreateNodeRequestDto,
     NodeIpDto,
     CreateNodeResponseDto,
@@ -498,6 +503,7 @@ from .external_squads import (
     DeleteExternalSquadResponseDto,
     ExternalSquadDto,
     ExternalSquadInfoDto,
+    ExternalSquadHostOverridesDto,
     ExternalSquadSubscriptionSettingsDto,
     ExternalSquadTemplateDto,
     GetExternalSquadByUuidResponseDto,
@@ -1209,4 +1215,10 @@ __all__ = [
     "TorrentBlockerUserDto",
     "CloneHostRequestDto",
     "CloneHostResponseDto",
+    "FetchNodesUsageBodyDto",
+    "FetchNodesUsageResponseDto",
+    "GetInternalSquadUsageResponseDto",
+    "GetInternalSquadUserUsageResponseDto",
+    "ConfigProfileData",
+    "ExternalSquadHostOverridesDto",
 ]

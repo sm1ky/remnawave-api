@@ -3,8 +3,11 @@ import asyncio
 
 import pytest
 
-from remnawave.exceptions import NotFoundError
+from remnawave.exceptions import ApiError, NotFoundError
 from remnawave.models import (
+    DropByIpAddresses,
+    DropByUserUuids,
+    DropConnectionsRequestDto,
     FetchIpsResponseDto,
     FetchIpsResultResponseDto,
     FetchUsersIpsResponseDto,
@@ -14,6 +17,8 @@ from remnawave.models import (
     GeocheckByNodeResultResponseDto,
     GeocheckImageDto,
     GeocheckResult,
+    TargetAllNodes,
+    TargetSpecificNodes,
 )
 
 
@@ -24,6 +29,13 @@ async def node_uuid(remnawave) -> str:
     if not len(nodes):
         pytest.skip("В окружении нет ни одной ноды")
     return str(nodes[0].uuid)
+
+
+def _skip_without_connected_nodes(exc: ApiError) -> None:
+    """Панель отвечает A219, когда ни одна нода не подключена."""
+    if "Connected nodes not found" in str(exc):
+        pytest.skip("В окружении нет подключённых нод")
+    raise exc
 
 
 async def _poll_geocheck(remnawave, job_id: str, attempts: int = 15, delay: float = 2.0):
@@ -138,3 +150,50 @@ class TestConnectionsByUser:
             assert result.result.user_id == user_id
             assert isinstance(result.result.user_id, int)
             assert isinstance(result.result.nodes, list)
+
+
+class TestDropConnections:
+    """Сброс активных подключений (202 Accepted)"""
+
+    @pytest.mark.asyncio
+    async def test_drop_by_user_ids_on_all_nodes(self, remnawave):
+        users = await remnawave.users.get_all_users(size=1)
+        if not users.users:
+            pytest.skip("В окружении нет ни одного пользователя")
+
+        try:
+            response = await remnawave.connections.drop_connections(
+                DropConnectionsRequestDto(
+                    drop_by=DropByUserUuids(user_ids=[users.users[0].id]),
+                    target_nodes=TargetAllNodes(),
+                )
+            )
+        except ApiError as exc:
+            _skip_without_connected_nodes(exc)
+
+        assert response is None
+
+    @pytest.mark.asyncio
+    async def test_drop_by_ip_on_specific_nodes(self, remnawave, node_uuid):
+        try:
+            response = await remnawave.connections.drop_connections(
+                DropConnectionsRequestDto(
+                    drop_by=DropByIpAddresses(ip_addresses=["198.51.100.20"]),
+                    target_nodes=TargetSpecificNodes(node_uuids=[node_uuid]),
+                )
+            )
+        except ApiError as exc:
+            _skip_without_connected_nodes(exc)
+
+        assert response is None
+
+    def test_selectors_serialise_with_their_discriminator(self):
+        """dropBy/targetNodes уходят с полем-дискриминатором, иначе панель не разберёт"""
+        dto = DropConnectionsRequestDto(
+            drop_by=DropByUserUuids(user_ids=[1, 2]),
+            target_nodes=TargetAllNodes(),
+        )
+
+        payload = dto.model_dump(exclude_none=True, by_alias=True, mode="json")
+        assert payload["dropBy"] == {"by": "userIds", "userIds": [1, 2]}
+        assert payload["targetNodes"] == {"target": "allNodes"}

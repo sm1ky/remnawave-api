@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated, Dict, List, Literal, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 from remnawave.enums import (
     ResponseRuleConditionOperator,
@@ -15,6 +15,8 @@ from remnawave.models.hosts import HostTag
 
 
 class ResponseRuleCondition(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     """Condition to check against request headers"""
     header_name: Annotated[str, StringConstraints(pattern=r"^[!#$%&'*+\-.0-9A-Z^_`a-z|~]+$")] = Field(
         alias="headerName"
@@ -38,6 +40,8 @@ class ResponseModificationEncryption(BaseModel):
 
 class ResponseModifications(BaseModel):
     """Response modifications to apply when rule matches"""
+    model_config = ConfigDict(populate_by_name=True)
+
     headers: Optional[List[ResponseModificationHeader]] = None
     apply_headers_to_end: Optional[bool] = Field(
         None,
@@ -99,6 +103,8 @@ class ResponseModifications(BaseModel):
 
 class ResponseRule(BaseModel):
     """Individual response rule configuration"""
+    model_config = ConfigDict(populate_by_name=True)
+
     name: Annotated[str, StringConstraints(min_length=1, max_length=50)]
     description: Optional[Annotated[str, StringConstraints(min_length=1, max_length=250)]] = None
     enabled: bool
@@ -127,6 +133,8 @@ class ResponseRules(BaseModel):
 
 
 class CustomRemarksDto(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     """Custom remarks for different user states"""
     expired_users: List[str] = Field(alias="expiredUsers", min_length=1)
     limited_users: List[str] = Field(alias="limitedUsers", min_length=1)
@@ -137,6 +145,8 @@ class CustomRemarksDto(BaseModel):
 
 
 class HwidSettingsDto(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     """HWID (Hardware ID) settings"""
     enabled: bool
     fallback_device_limit: int = Field(alias="fallbackDeviceLimit")

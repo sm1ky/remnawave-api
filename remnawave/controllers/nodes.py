@@ -32,6 +32,10 @@ from remnawave.models import (
 from remnawave.rapid import BaseController, delete, get, patch, post
 
 
+# `forceRestart` is required by the panel, so a bodyless restart is rejected with 400.
+_DEFAULT_RESTART_NODE_BODY = RestartNodeRequestBodyDto(force_restart=False)
+
+
 class NodesController(BaseController):
     @get("/nodes/tags", response_class=GetAllNodesTagsResponseDto)
     async def get_all_nodes_tags(
@@ -99,7 +103,7 @@ class NodesController(BaseController):
     async def restart_node(
         self,
         uuid: Annotated[str, Path(description="Node UUID")],
-        body: Annotated[RestartNodeRequestBodyDto | None, PydanticBody()] = None,
+        body: Annotated[RestartNodeRequestBodyDto, PydanticBody()] = _DEFAULT_RESTART_NODE_BODY,
     ) -> RestartNodeResponseDto:
         """Restart Node"""
         ...
