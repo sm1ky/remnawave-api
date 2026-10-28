@@ -33,6 +33,7 @@ pip install git+https://github.com/sm1ky/remnawave-api.git@development
 
 | Contract Version | Remnawave Panel Version |
 | ---------------- | ----------------------- |
+| 3.5.0            | >=3.4.4                 |
 | 3.4.5            | >=3.4.4                 |
 | 3.4.4            | >=3.4.4                 |
 | 3.4.3            | >=3.4.0                 |
@@ -70,8 +71,8 @@ pip install git+https://github.com/sm1ky/remnawave-api.git@development
 
 ### Dependencies
 - `orjson` (>=3.10.15, <4.0.0)
-- `rapid-api-client` (==0.6.0)
-- `httpx` (>=0.27.2, <0.28.0)
+- `rapid-api-client` (>=0.8.4, <0.9.0)
+- `httpx` (>=0.27.2, <1.0.0)
 - `pydantic[email]` (>=2.9.2, <3.0.0)
 - `cryptography` (>=48.0.1, <51.0.0)
 
