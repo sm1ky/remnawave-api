@@ -4,9 +4,9 @@ from typing import Any, Callable, Coroutine, Type
 
 from httpx import AsyncClient, Response
 from pydantic import TypeAdapter
-from rapid_api_client.typing import BM, T
 
 from .client import BaseController, CustomRapidParameters
+from .typing import BM, T
 
 
 def http(

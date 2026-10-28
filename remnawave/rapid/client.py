@@ -6,8 +6,9 @@ from typing import Any, Dict, Mapping, Self, Tuple, Type
 
 import httpx
 import orjson
-from httpx import Request, Response
+from httpx import AsyncClient, Request, Response
 from pydantic import BaseModel, RootModel, TypeAdapter
+from pydantic_core import PydanticUndefined
 from rapid_api_client import (
     Body,
     FileBody,
@@ -17,16 +18,21 @@ from rapid_api_client import (
     RapidApi,
 )
 from rapid_api_client.annotations import Header, JsonBody, Path, Query
-from rapid_api_client.client import pydantic_xml, RapidParameter, RapidParameters
-from rapid_api_client.typing import BM, T
+from rapid_api_client.parameters import ParameterManager, RapidParameter
 from rapid_api_client.utils import filter_none_values, find_annotation
+from rapid_api_client.xml import pydantic_xml
 
 from remnawave.exceptions import ApiError, ApiErrorResponse, handle_api_error
 from remnawave.rapid import AttributeBody
+from remnawave.rapid.typing import BA, BM, T
 from remnawave.utils.serializer import orjson_default
 
 
 class BaseController(RapidApi):
+
+    def __init__(self, client: AsyncClient) -> None:
+        super().__init__(async_client=client)
+        self.client = client
 
     def _build_request(
         self,
@@ -141,19 +147,44 @@ class BaseController(RapidApi):
         raise ValueError(f"Response class not supported: {response_class}")
 
 
-class CustomRapidParameters(RapidParameters):
+class RawRapidParameter(RapidParameter[BA]):
+    """A parameter whose value is returned exactly as the caller passed it.
+
+    Since 0.8.0 ``RapidParameter.get_value`` runs the annotation transformer,
+    which ``Path``, ``Query`` and ``Header`` default to ``str`` and
+    ``PydanticBody`` to ``model_dump_json``. The SDK serializes values on its
+    own — httpx for the query string, ``orjson`` for ``AttributeBody``,
+    ``model_dump`` for ``PydanticBody`` — so the transformer is skipped and the
+    request stays byte-for-byte what it was.
+    """
+
+    def get_value(self, ba: BoundArguments, *, validate: bool = True) -> Any:
+        if self.name in ba.arguments:
+            out = ba.arguments.get(self.name)
+        else:
+            out = self.annot.get_default(call_default_factory=True)
+            if out is PydanticUndefined:
+                raise ValueError(f"Missing value for parameter {self.name}")
+
+        if validate:
+            out = TypeAdapter(self.param.annotation).validate_python(out)
+
+        return out
+
+
+class CustomRapidParameters(ParameterManager):
     @classmethod
     def from_sig(cls, sig: Signature) -> Self:
         out = cls()
         for parameter in sig.parameters.values():
             if (annot := find_annotation(parameter, Path)) is not None:
-                out.path_parameters.append(RapidParameter(parameter, annot))
+                out.path_parameters.append(RawRapidParameter(parameter, annot))
             if (annot := find_annotation(parameter, Query)) is not None:
-                out.query_parameters.append(RapidParameter(parameter, annot))
+                out.query_parameters.append(RawRapidParameter(parameter, annot))
             if (annot := find_annotation(parameter, Header)) is not None:
-                out.header_parameters.append(RapidParameter(parameter, annot))
+                out.header_parameters.append(RawRapidParameter(parameter, annot))
             if (annot := find_annotation(parameter, Body)) is not None:
-                out.body_parameters.append(RapidParameter(parameter, annot))
+                out.body_parameters.append(RawRapidParameter(parameter, annot))
 
         if len(out.body_parameters) > 0:
             first_body_param = out.body_parameters[0]
