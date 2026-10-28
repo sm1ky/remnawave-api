@@ -3,7 +3,8 @@ name: Publish Python Package
 on:
   push:
     branches:
-      - production 
+      - production
+      - release-2.8
 
 permissions:
   contents: write
@@ -19,10 +20,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 
-
-      - name: Pull latest changes
-        if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
-        run: git pull origin production --tags --force
 
       - name: Set up Python
         if: ${{ !contains(github.event.head_commit.message, '[skip publish]') }}
