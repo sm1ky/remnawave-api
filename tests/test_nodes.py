@@ -26,7 +26,7 @@ from remnawave.models import (
 )
 from remnawave.models.nodes import ReorderNodeItem
 from tests.conftest import REMNAWAVE_CONFIG_PROFILE_UUID, REMNAWAVE_INBOUND_UUID
-from tests.utils import generate_random_string
+from tests.utils import generate_random_string, generate_unroutable_address
 
 
 @pytest.mark.asyncio
@@ -34,7 +34,7 @@ async def test_nodes(remnawave):
     all_nodes = await remnawave.nodes.get_all_nodes()
     assert isinstance(all_nodes, GetAllNodesResponseDto)
 
-    random_ip: str = f"{random.randint(500, 800)}" + ".0.0.1"
+    random_ip: str = generate_unroutable_address()
     random_port: int = random.randint(5000, 8000)
     random_name: str = generate_random_string()
     create_node = await remnawave.nodes.create_node(
@@ -104,7 +104,7 @@ class TestNodeIpsAndIntegrations:
         created = await remnawave.nodes.create_node(
             CreateNodeRequestDto(
                 name=generate_random_string(),
-                address=f"{random.randint(500, 800)}.0.0.1",
+                address=generate_unroutable_address(),
                 port=random.randint(5000, 8000),
                 config_profile=NodeConfigProfileRequestDto.model_validate(
                     {
@@ -179,7 +179,7 @@ class TestNodeIpsAndIntegrations:
         created = await remnawave.nodes.create_node(
             CreateNodeRequestDto(
                 name=generate_random_string(),
-                address=f"{random.randint(500, 800)}.0.0.1",
+                address=generate_unroutable_address(),
                 port=random.randint(5000, 8000),
                 config_profile=NodeConfigProfileRequestDto.model_validate(
                     {
@@ -239,7 +239,7 @@ class TestNodeLifecycleActions:
         created = await remnawave.nodes.create_node(
             CreateNodeRequestDto(
                 name=generate_random_string(),
-                address=f"{random.randint(500, 800)}.0.0.1",
+                address=generate_unroutable_address(),
                 port=random.randint(5000, 8000),
                 config_profile=NodeConfigProfileRequestDto.model_validate(
                     {

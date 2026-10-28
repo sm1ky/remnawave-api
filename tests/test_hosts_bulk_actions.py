@@ -6,7 +6,7 @@ import pytest
 from remnawave.exceptions import NotFoundError
 from remnawave.models import CreateHostRequestDto, UpdateManyHostsRequestDto
 from tests.conftest import REMNAWAVE_CONFIG_PROFILE_UUID, REMNAWAVE_INBOUND_UUID
-from tests.utils import generate_random_string
+from tests.utils import generate_random_string, generate_unroutable_address
 
 
 @pytest.fixture
@@ -20,7 +20,7 @@ async def hosts(remnawave):
                     inbound_uuid=REMNAWAVE_INBOUND_UUID,
                     config_profile_inbound_uuid=REMNAWAVE_CONFIG_PROFILE_UUID,
                     remark=generate_random_string(),
-                    address=f"{random.randint(500, 800)}.0.0.1",
+                    address=generate_unroutable_address(),
                     port=random.randint(5000, 8000),
                 )
             )
@@ -88,7 +88,7 @@ class TestHostsBulkActions:
                         inbound_uuid=REMNAWAVE_INBOUND_UUID,
                         config_profile_inbound_uuid=REMNAWAVE_CONFIG_PROFILE_UUID,
                         remark=generate_random_string(),
-                        address=f"{random.randint(500, 800)}.0.0.1",
+                        address=generate_unroutable_address(),
                         port=random.randint(5000, 8000),
                     )
                 )

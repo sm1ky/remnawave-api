@@ -28,7 +28,7 @@ from remnawave.models import (
     UpdateManyHostsRequestDto,
 )
 from tests.conftest import REMNAWAVE_INBOUND_UUID, REMNAWAVE_CONFIG_PROFILE_UUID
-from tests.utils import generate_random_string
+from tests.utils import generate_random_string, generate_unroutable_address
 
 
 class TestHostsBasic:
@@ -61,7 +61,7 @@ class TestHostsCRUD:
     @pytest.fixture
     async def test_host(self, remnawave):
         """Фикстура для создания тестового хоста"""
-        random_ip: str = f"{random.randint(500, 800)}" + ".0.0.1"
+        random_ip: str = generate_unroutable_address()
         random_port: int = random.randint(5000, 8000)
         random_remark: str = generate_random_string()
         
@@ -87,7 +87,7 @@ class TestHostsCRUD:
     @pytest.mark.asyncio
     async def test_create_host(self, remnawave):
         """Тест создания хоста"""
-        random_ip: str = f"{random.randint(500, 800)}" + ".0.0.1"
+        random_ip: str = generate_unroutable_address()
         random_port: int = random.randint(5000, 8000)
         random_remark: str = generate_random_string()
         
@@ -149,7 +149,7 @@ class TestHostsCRUD:
     async def test_delete_host(self, remnawave):
         """Тест удаления хоста"""
         # Сначала создаем хост для удаления
-        random_ip: str = f"{random.randint(500, 800)}" + ".0.0.1"
+        random_ip: str = generate_unroutable_address()
         random_port: int = random.randint(5000, 8000)
         random_remark: str = generate_random_string()
         
@@ -223,7 +223,7 @@ class TestHostsAdvanced:
     @pytest.mark.asyncio
     async def test_create_host_with_advanced_options(self, remnawave):
         """Тест создания хоста с расширенными параметрами"""
-        random_ip: str = f"{random.randint(500, 800)}" + ".0.0.1"
+        random_ip: str = generate_unroutable_address()
         random_port: int = random.randint(5000, 8000)
         random_remark: str = generate_random_string()
         
@@ -292,7 +292,7 @@ class TestHostInternalSquadsAndMapper:
                 inbound_uuid=REMNAWAVE_INBOUND_UUID,
                 config_profile_inbound_uuid=REMNAWAVE_CONFIG_PROFILE_UUID,
                 remark=generate_random_string(),
-                address=f"{random.randint(500, 800)}.0.0.1",
+                address=generate_unroutable_address(),
                 port=random.randint(5000, 8000),
             )
         )
@@ -389,7 +389,7 @@ class TestHostInternalSquadsAndMapper:
                 inbound_uuid=REMNAWAVE_INBOUND_UUID,
                 config_profile_inbound_uuid=REMNAWAVE_CONFIG_PROFILE_UUID,
                 remark=generate_random_string(),
-                address=f"{random.randint(500, 800)}.0.0.1",
+                address=generate_unroutable_address(),
                 port=random.randint(5000, 8000),
                 internal_squads=HostInternalSquadsDto(
                     mode=InternalSquadsMode.ALLOW_ONLY, squads=[internal_squad.uuid]
@@ -431,7 +431,7 @@ class TestHostClone:
                 inbound_uuid=REMNAWAVE_INBOUND_UUID,
                 config_profile_inbound_uuid=REMNAWAVE_CONFIG_PROFILE_UUID,
                 remark=generate_random_string(),
-                address=f"{random.randint(500, 800)}.0.0.1",
+                address=generate_unroutable_address(),
                 port=random.randint(5000, 8000),
                 tags=["CLONE_SRC"],
             )

@@ -37,3 +37,19 @@ def generate_utc_isoformat_range() -> Tuple[str, str]:
         start.isoformat(timespec="seconds"),
         end.isoformat(timespec="seconds"),
     )
+
+
+def generate_unroutable_address() -> str:
+    """Адрес для тестовых нод и хостов: заведомо нерабочий, но почти всегда уникальный.
+
+    Первый октет заведомо больше 255, так что адрес никуда не резолвится и
+    подключения не будет. Прежний вариант `randint(500, 800)` + `.0.0.1` давал
+    всего 301 значение, а адрес ноды на панели уникален — отсюда случайные
+    ConflictError на повторных прогонах.
+    """
+    return (
+        f"{random.randint(500, 999)}"
+        f".{random.randint(0, 255)}"
+        f".{random.randint(0, 255)}"
+        f".{random.randint(1, 254)}"
+    )
